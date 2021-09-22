@@ -15,9 +15,9 @@ type State =
   | { type: 'DEFAULT' }
   | { type: 'ACTIVE' }
   | { type: 'COMPLETE' }
-  | { type: 'SCHEMA'; schema: number; active: boolean }
-  | { type: 'ROLLING_DEPLOY'; schema: number; code: number }
-  | { type: 'DEPLOY'; schema: number; code: number }
+  | { type: 'SCHEMA'; schema: string; active: boolean }
+  | { type: 'ROLLING_DEPLOY'; schema: string; code: number }
+  | { type: 'DEPLOY'; schema: string; code: number }
   | { type: 'BROKEN' }
   | { type: 'SHOW' }
   | { type: 'HIDE' };

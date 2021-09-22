@@ -1,15 +1,16 @@
-<script lang="ts">
-	import Document from '$lib/svg/icons/Document.svelte';
+<script context="module">
+  export const COLORS = ['bg-purple-400', 'bg-green-400', 'bg-blue-400', 'bg-pink-400'];
+</script>
 
-	export let codeVersion = 0;
-	export let schemaVersion = 0;
-	export let deployed = false;
+<script lang="ts">
+  import Document from '$lib/svg/icons/Document.svelte';
+
+  export let code;
+  export let schema: string;
 </script>
 
 <div
-	class="grid grid-flow-col place-content-center transition-all duration-300 rounded bg-purple-300 p-[1px]"
-	class:bg-green-300={deployed ? codeVersion === 1 : false}
-	class:bg-blue-300={deployed ? codeVersion === 2 : false}
+  class={`relative grid grid-flow-col place-content-center transition-all duration-300 rounded p-[1px] ${COLORS[code]}`}
 >
-	<Document version={deployed ? schemaVersion : 0} />
+  <Document version={schema} />
 </div>

@@ -9,18 +9,18 @@ steps:
   - title: 'Build Gateway artifacts for release'
     states:
       task-run-tests: { type: COMPLETE }
-      task-build-deployable: { type: ACTIVE, code: 1 }
-  - title: Initiate a rolling deploy of the Gateway
+      task-build-deployable: { type: ACTIVE, code: 3 }
+  - title: Initiate a rolling deploy of the Gateway to the "green" server pool
     states:
-      task-build-deployable: { type: COMPLETE, code: 1 }
+      task-build-deployable: { type: COMPLETE, code: 3 }
       task-initiate-deployment: { type: ACTIVE }
-      gateway-green: { type: ROLLING_DEPLOY, schema: 0, code: 1 }
-  - title: Flip load balancer to route traffic to new Gateway
+      gateway-green: { type: ROLLING_DEPLOY, code: 3 }
+  - title: Flip load balancer to route traffic to the "green" server pool
     states:
       task-initiate-deployment: { type: COMPLETE }
       task-flip-lb: { type: ACTIVE }
       lb: { type: 'ACTIVE' }
-      gateway-green: { type: DEPLOY, schema: 0, code: 1 }
+      gateway-green: { type: DEPLOY, code: 3 }
       B: { type: 'HIDE' }
       B2: { type: 'ACTIVE' }
       C: { type: 'HIDE' }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
 import { readable } from 'svelte/store';
 import type { Readable } from 'svelte/store';
 import { interpret, State } from 'xstate';
@@ -15,7 +17,7 @@ import type {
   Interpreter
 } from 'xstate';
 
-interface UseMachineOptions<TContext extends Record<string, unknown>, TEvent extends EventObject> {
+interface UseMachineOptions<TContext extends object, TEvent extends EventObject> {
   /**
    * If provided, will be merged with machine's `context`.
    */
@@ -28,21 +30,21 @@ interface UseMachineOptions<TContext extends Record<string, unknown>, TEvent ext
 }
 
 export function useMachine<
-  TContext extends Record<string, unknown>,
+  TContext extends object,
   TEvent extends EventObject,
   TTypestate extends Typestate<TContext>
 >(
-  machine: StateMachine<TContext, unknown, TEvent, TTypestate>,
+  machine: StateMachine<TContext, any, TEvent, TTypestate>,
   options: Partial<InterpreterOptions> &
     Partial<UseMachineOptions<TContext, TEvent>> &
     Partial<MachineOptions<TContext, TEvent>> = {}
 ): {
-  state: Readable<State<TContext, TEvent, unknown, TTypestate>>;
+  state: Readable<State<TContext, TEvent, any, TTypestate>>;
   send: (
     event: SingleOrArray<Event<TEvent>> | SCXML.Event<TEvent>,
     payload?: EventData
-  ) => State<TContext, TEvent, unknown, TTypestate>;
-  service: Interpreter<TContext, unknown, TEvent, TTypestate>;
+  ) => State<TContext, TEvent, any, TTypestate>;
+  service: Interpreter<TContext, any, TEvent, TTypestate>;
 } {
   const {
     context,
