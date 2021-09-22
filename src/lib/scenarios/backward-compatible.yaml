@@ -1,0 +1,70 @@
+steps:
+  - title: Merge pull request to the Subgraph A repository containing both schema and code changes
+    states:
+      task-merge-pr: { type: ACTIVE }
+  - title: Run prerelease steps (tests and schema checks)
+    states:
+      task-merge-pr: { type: COMPLETE }
+      task-run-tests: { type: ACTIVE }
+      task-run-checks: { type: ACTIVE }
+  - title: 'Build artifacts for release: the subgraph schema for publishing to Studio, and the deployable artifact for the Subgraph A servers'
+    states:
+      task-run-tests: { type: COMPLETE }
+      task-run-checks: { type: COMPLETE }
+      task-build-schema: { type: ACTIVE, schema: 2 }
+      task-build-deployable: { type: ACTIVE, code: 1 }
+  - title: Publish the subgraph schema to the "prod" variant in Apollo Studio
+    states:
+      task-build-schema: { type: COMPLETE, schema: 2 }
+      task-build-deployable: { type: COMPLETE, code: 1 }
+      task-publish-to-prod: { type: ACTIVE }
+      studio: { type: ACTIVE }
+  - title: Studio generates a new supergraph which propagates to the Gateway servers
+    description: |
+      At this point, the Gateway would accept requests that include new schema
+      elements. However, the subgraph will return a GraphQL validation error.
+      In practice, this isn't a concern; clients don't instantly update their
+      operations to include new schema elements when the Gateway's schema updates.
+    states:
+      studio: { type: ACTIVE }
+      gateway-blue: { type: SCHEMA, schema: 1, active: true }
+  - title: Initiate a rolling deploy of Subgraph A
+    states:
+      task-publish-to-prod: { type: COMPLETE }
+      task-initiate-deployment: { type: ACTIVE }
+      studio: { type: DEFAULT }
+      gateway-blue: { type: SCHEMA, schema: 1, active: false }
+      subgraph-a: { type: ROLLING_DEPLOY, schema: 2, code: 1 }
+  - title: Now clients can start making requests with the new schema
+    states:
+      task-initiate-deployment: { type: COMPLETE }
+      client: { type: ACTIVE }
+      subgraph-a: { type: DEPLOY, schema: 2, code: 1 }
+tasks:
+  - - id: 'task-merge-pr'
+      label: 'Merge PR'
+  - - id: 'task-run-tests'
+      label: 'Run Tests'
+    - id: 'task-run-checks'
+      label: 'Run Checks'
+  - - id: 'task-build-schema'
+      label: 'Build Schema'
+      icon: true
+    - id: 'task-build-deployable'
+      label: 'Build Deployable'
+      icon: true
+  - - id: 'task-publish-to-prod'
+      label: 'Publish to prod'
+    - id: 'task-initiate-deployment'
+      label: 'Initiate Deployment'
+lines:
+  - { id: 'A', from: 'client', to: 'gateway-blue', after: '0s;Fanim.end' }
+  - { id: 'C', from: 'gateway-blue', to: 'subgraph-a', after: 'Aanim.end' }
+  - { id: 'D', from: 'gateway-blue', to: 'subgraph-b', after: 'Aanim.end' }
+  - { id: 'E', from: 'subgraph-a', to: 'database', after: 'Canim.end' }
+  - { id: 'F', from: 'subgraph-b', to: 'rest', after: 'Danim.end' }
+  - { id: 'G', from: 'studio', to: 'gateway-blue', fromAnchor: 'B', toAnchor: 'T' }
+boxes:
+  - contain: ['lb', 'gateway-blue', 'gateway-green', 'subgraph-a', 'subgraph-b', 'database', 'rest']
+    p: 12
+    pt: 28

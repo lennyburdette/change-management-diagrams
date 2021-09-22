@@ -1,0 +1,64 @@
+steps:
+  - title: Merge pull request to the Gateway repository containing code changes
+    states:
+      task-merge-pr: { type: ACTIVE }
+  - title: Run prerelease steps
+    states:
+      task-merge-pr: { type: COMPLETE }
+      task-run-tests: { type: ACTIVE }
+  - title: 'Build Gateway artifacts for release'
+    states:
+      task-run-tests: { type: COMPLETE }
+      task-build-deployable: { type: ACTIVE, code: 1 }
+  - title: Initiate a rolling deploy of the Gateway
+    states:
+      task-build-deployable: { type: COMPLETE, code: 1 }
+      task-initiate-deployment: { type: ACTIVE }
+      gateway-green: { type: ROLLING_DEPLOY, schema: 0, code: 1 }
+  - title: Flip load balancer to route traffic to new Gateway
+    states:
+      task-initiate-deployment: { type: COMPLETE }
+      task-flip-lb: { type: ACTIVE }
+      lb: { type: 'ACTIVE' }
+      gateway-green: { type: DEPLOY, schema: 0, code: 1 }
+      B: { type: 'HIDE' }
+      B2: { type: 'ACTIVE' }
+      C: { type: 'HIDE' }
+      C2: { type: 'ACTIVE' }
+      D: { type: 'HIDE' }
+      D2: { type: 'ACTIVE' }
+  - title: Now client traffic goes through the new Gateway
+    states:
+      lb: { type: 'DEFAULT' }
+      task-flip-lb: { type: COMPLETE }
+      client: { type: ACTIVE }
+      B2: { type: 'SHOW' }
+      C2: { type: 'SHOW' }
+      D2: { type: 'SHOW' }
+tasks:
+  - - id: 'task-merge-pr'
+      label: 'Merge PR'
+  - - id: 'task-run-tests'
+      label: 'Run Tests'
+  - - id: 'task-build-deployable'
+      label: 'Build Deployable'
+      icon: true
+  - - id: 'task-initiate-deployment'
+      label: 'Initiate Deployment'
+    - id: 'task-flip-lb'
+      label: 'Flip Load Balancer'
+lines:
+  - { id: 'A', from: 'client', to: 'lb', after: '0s;Fanim.end' }
+  - { id: 'B', from: 'lb', to: 'gateway-blue', after: 'Aanim.end' }
+  - { id: 'B2', from: 'lb', to: 'gateway-green', after: 'Aanim.end', hidden: true }
+  - { id: 'C', from: 'gateway-blue', to: 'subgraph-a', after: 'Banim.end' }
+  - { id: 'C2', from: 'gateway-green', to: 'subgraph-a', after: 'Banim.end', hidden: true }
+  - { id: 'D', from: 'gateway-blue', to: 'subgraph-b', after: 'Banim.end' }
+  - { id: 'D2', from: 'gateway-green', to: 'subgraph-b', after: 'Banim.end', hidden: true }
+  - { id: 'E', from: 'subgraph-a', to: 'database', after: 'Canim.end' }
+  - { id: 'F', from: 'subgraph-b', to: 'rest', after: 'Danim.end' }
+  # - { id: 'G', from: 'studio', to: 'gateway-blue', fromAnchor: 'B', toAnchor: 'T' }
+boxes:
+  - contain: ['lb', 'gateway-blue', 'gateway-green', 'subgraph-a', 'subgraph-b', 'database', 'rest']
+    p: 12
+    pt: 28
