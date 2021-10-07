@@ -1,7 +1,17 @@
 steps:
+  - title: Perform the deprecation process for elements to remove/change
+    states:
+      task-deprecation: { type: ACTIVE }
+  - title: Determine which clients use the affected elements and update their operations
+    states:
+      task-deprecation: { type: COMPLETE }
+      task-update-clients: { type: ACTIVE }
+      client: { type: ACTIVE }
   - title: Merge pull request to the Products repository containing both schema and code changes
     states:
+      task-update-clients: { type: COMPLETE }
       task-merge-pr: { type: ACTIVE }
+      client: { type: DEFAULT }
   - title: 'Run prerelease steps: tests and schema checks'
     description: |
       Schema checks use the schema registry in Studio to ensure that the new
@@ -26,10 +36,10 @@ steps:
       studio: { type: ACTIVE }
   - title: Studio generates a new supergraph which propagates to the Gateway servers
     description: |
-      At this point, the Gateway would accept requests that include new schema
-      elements. However, the subgraph will return a GraphQL validation error.
-      In practice, this isn't a concern; clients don't instantly update their
-      operations to include new schema elements when the Gateway's schema updates.
+      At this point, the Gateway will no longer accept requests that include the
+      changed/removed schema elements. If we've gone through the appropriate
+      deprecation lifecycle and observed that client usage of these elements has
+      dropped to an acceptable level, this will not be an issue.
     states:
       studio: { type: ACTIVE }
       gateway-blue: { type: SCHEMA, schema: BX, active: true }
@@ -40,12 +50,16 @@ steps:
       studio: { type: DEFAULT }
       gateway-blue: { type: SCHEMA, schema: BX, active: false }
       subgraph-a: { type: ROLLING_DEPLOY, schema: B, code: 3 }
-  - title: Now clients can start making requests with the new schema
+  - title: Client requests without the changed/removed schema elements continue to work.
     states:
       task-initiate-deployment: { type: COMPLETE }
       client: { type: ACTIVE }
       subgraph-a: { type: DEPLOY, schema: B, code: 3 }
 tasks:
+  - - id: task-deprecation
+      label: Deprecate Schema
+  - - id: task-update-clients
+      label: Update Clients
   - - id: 'task-merge-pr'
       label: 'Merge PR'
   - - id: 'task-run-tests'

@@ -7,8 +7,9 @@
   import Component from '$lib/dom/Component.svelte';
   import TopologyContainer from '$lib/dom/TopologyContainer.svelte';
   import Controls from '$lib/dom/Controls.svelte';
+  import Cloud from '$lib/svg/icons/Cloud.svelte';
 
-  import SCRIPT from './gateway-logic.yaml';
+  import SCRIPT from './backward-incompatible.yaml';
 
   const { steps, tasks, lines: lineConfigs, boxes: boxConfigs } = SCRIPT;
 
@@ -21,28 +22,25 @@
   $: states.set(reifiedStates[currentStep] ?? {});
 </script>
 
-<div class="space-y-2 justify-center font-mono text-sm">
+<div class="space-y-2 justify-center font-mono">
   <Tasks {tasks} />
 
   <TopologyContainer {lineConfigs} {boxConfigs}>
     <div class="relative grid topology gap-6 justify-center items-center">
-      <!-- <Component classes="col-start-3" id="studio" hidePlaceholder>
-				<Cloud slot="icon" />
-				Apollo<br />Studio
-			</Component> -->
+      <Component classes="col-start-2" id="studio" hidePlaceholder>
+        <Cloud slot="icon" />
+        Apollo<br />Studio
+      </Component>
 
       <Component classes="col-start-1" id="client" name="Client" />
 
-      <Component id="lb" small>Load<br />Balancer</Component>
-
       <div class="grid gap-2">
-        <ServerPool id="gateway-blue" name="Gateway" cluster="Blue" schema="AX" code={0} />
-        <ServerPool id="gateway-green" name="Gateway" cluster="Green" schema="AX" code={0} />
+        <ServerPool id="gateway-blue" name="Gateway" variant="prod" schema="AX" code={1} />
       </div>
 
       <div class="grid gap-2">
-        <Component id="subgraph-a" name="Products" />
-        <Component id="subgraph-b" name="Reviews" />
+        <ServerPool id="subgraph-a" name="Products" schema="A" code={0} />
+        <ServerPool id="subgraph-b" name="Reviews" schema="X" code={2} />
       </div>
 
       <div class="grid gap-2">

@@ -3,14 +3,13 @@
   import { initStates, reifyStates } from '$lib/dom/state';
 
   import ServerPool from '$lib/dom/ServerPool.svelte';
-  import Tasks from '$lib/dom/Tasks.svelte';
   import Component from '$lib/dom/Component.svelte';
   import TopologyContainer from '$lib/dom/TopologyContainer.svelte';
   import Controls from '$lib/dom/Controls.svelte';
 
-  import SCRIPT from './gateway-logic.yaml';
+  import SCRIPT from './data-source.yaml';
 
-  const { steps, tasks, lines: lineConfigs, boxes: boxConfigs } = SCRIPT;
+  const { steps, lines: lineConfigs, boxes: boxConfigs } = SCRIPT;
 
   initBoxes();
 
@@ -21,33 +20,22 @@
   $: states.set(reifiedStates[currentStep] ?? {});
 </script>
 
-<div class="space-y-2 justify-center font-mono text-sm">
-  <Tasks {tasks} />
-
+<div class="space-y-2 justify-center font-mono">
   <TopologyContainer {lineConfigs} {boxConfigs}>
     <div class="relative grid topology gap-6 justify-center items-center">
-      <!-- <Component classes="col-start-3" id="studio" hidePlaceholder>
-				<Cloud slot="icon" />
-				Apollo<br />Studio
-			</Component> -->
-
+      <Component classes="col-start-3" id="featureflags" name="Feature Flags" small />
       <Component classes="col-start-1" id="client" name="Client" />
 
-      <Component id="lb" small>Load<br />Balancer</Component>
+      <Component id="gateway" name="Gateway" />
 
       <div class="grid gap-2">
-        <ServerPool id="gateway-blue" name="Gateway" cluster="Blue" schema="AX" code={0} />
-        <ServerPool id="gateway-green" name="Gateway" cluster="Green" schema="AX" code={0} />
-      </div>
-
-      <div class="grid gap-2">
-        <Component id="subgraph-a" name="Products" />
-        <Component id="subgraph-b" name="Reviews" />
+        <ServerPool id="subgraph-a" name="Products" schema="A" code={0} />
+        <Component id="subgraph-b" name="Reviews" small />
       </div>
 
       <div class="grid gap-2">
         <Component id="database" name="Database" />
-        <Component id="rest" name="REST API" />
+        <Component id="rest" name="REST API" small />
       </div>
     </div>
   </TopologyContainer>

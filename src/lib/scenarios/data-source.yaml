@@ -1,0 +1,42 @@
+steps:
+  - title: Make a backward-compatible change to the data source
+    description: E.g., add a column to our database, or make a new REST endpoint
+    states:
+      database: { type: ACTIVE }
+  - title: Change the subgraph to leverage the data source change behind a feature flag
+    description: E.g., by changing SQL queries or making different REST calls
+    states:
+      database: { type: DEFAULT }
+      subgraph-a: { type: ACTIVE }
+  - title: Merge and release the new subgraph version
+    states:
+      subgraph-a: { type: ROLLING_DEPLOY, code: 1 }
+  - title: By sending a user identifier from clients, we get a stable feature flag value to determine the logic
+    description: The gateway should be configured to forward these header to subgraphs
+    states:
+      client: { type: ACTIVE }
+      subgraph-a: { type: DEPLOY, code: 1 }
+  - title: Ramp up the feature flag rollout to 100%
+    states:
+      client: { type: DEFAULT }
+      featureflags: { type: ACTIVE }
+  - title: Remove the old code path from the subgraph resolver
+    states:
+      featureflags: { type: DEFAULT }
+      subgraph-a: { type: ROLLING_DEPLOY, code: 3 }
+  - title: Remove the unused code or data from the data source
+    description: E.g., drop the unused column or delete the old REST endpoint
+    states:
+      subgraph-a: { type: DEPLOY, code: 3 }
+      database: { type: ACTIVE }
+lines:
+  - { id: 'A', from: 'client', to: 'gateway', after: '0s;Eanim.end' }
+  - { id: 'B', from: 'gateway', to: 'subgraph-a', after: 'Aanim.end' }
+  - { id: 'C', from: 'gateway', to: 'subgraph-b', after: 'Aanim.end' }
+  - { id: 'D', from: 'subgraph-a', to: 'database', after: 'Banim.end' }
+  - { id: 'E', from: 'subgraph-b', to: 'rest', after: 'CAnim.end' }
+  - { id: 'F', from: 'subgraph-a', to: 'featureflags', fromAnchor: 'T', toAnchor: 'B' }
+boxes:
+  - contain: ['gateway', 'subgraph-a', 'subgraph-b', 'rest', 'database']
+    p: 12
+    pt: 28

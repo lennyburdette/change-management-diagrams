@@ -35,12 +35,12 @@
       <Component classes="col-start-1" id="client" name="Client" />
 
       <div class="grid gap-2">
-        <ServerPool id="gateway-blue" name="Gateway" variant="prod" schema="XY" code={1} />
+        <ServerPool id="gateway-blue" name="Gateway" variant="prod" schema="AX" code={1} />
       </div>
 
       <div class="grid gap-2">
-        <ServerPool id="subgraph-a" name="Subgraph A" schema="X" code={0} />
-        <ServerPool id="subgraph-b" name="Subgraph B" schema="Y" code={2} />
+        <ServerPool id="subgraph-a" name="Products" schema="A" code={0} />
+        <ServerPool id="subgraph-b" name="Reviews" schema="X" code={2} />
       </div>
 
       <div class="grid gap-2">

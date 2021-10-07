@@ -31,6 +31,7 @@ export interface Step {
 export interface Script {
   steps: Step[];
   tasks: Task[][];
+  tasks2?: Task[][];
   lines: ConnectorConfig[];
   boxes: WrapperConfig[];
 }

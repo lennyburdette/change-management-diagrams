@@ -57,9 +57,7 @@
       },
       active: {
         entry: assign({
-          active: (_ctx, evt) => evt.active ?? false
-          // code,
-          // schema
+          active: (_) => true
         }),
         on: {
           SCHEMA: 'schema',
