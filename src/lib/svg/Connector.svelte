@@ -45,9 +45,9 @@
       case 'B':
         return to.x + to.width / 2;
       case 'R':
-        return to.x + to.width;
+        return to.x + to.width + 10;
       case 'L':
-        return to.x;
+        return to.x - 10;
     }
   })();
   $: y2 = (() => {
@@ -56,9 +56,9 @@
       case 'L':
         return to.y + to.height / 2;
       case 'T':
-        return to.y;
+        return to.y - 10;
       case 'B':
-        return to.y + to.height;
+        return to.y + to.height + 10;
     }
   })();
 
@@ -112,8 +112,11 @@
   $: l2x = l1x;
   $: l2y = y2;
 
-  $: d = `M ${x1},${y1} L ${l1x},${l1y} L ${l2x},${l2y} ${x2},${y2}`;
-  $: dAnimate = `M ${ax1},${ay1} L ${l1x},${l1y} L ${l2x},${l2y} ${ax2},${ay2}`;
+  // $: d = `M ${x1},${y1} L ${l1x},${l1y} L ${l2x},${l2y} ${x2},${y2}`;
+  $: d = [x1, y1, l1x, l1y, x2, x2].every((x) => !!x)
+    ? `M ${x1},${y1} S ${l1x},${l1y} ${x2},${y2}`
+    : 'M0,0';
+  // $: dAnimate = `M ${ax1},${ay1} L ${l1x},${l1y} L ${l2x},${l2y} ${ax2},${ay2}`;
 
   $: arrowDir = (() => {
     switch (toAnchor) {
@@ -128,24 +131,64 @@
     }
   })();
 
-  $: running = $state.type === 'DEFAULT';
+  $: running = false; // $state.type === 'DEFAULT';
   $: broken = $state.type === 'BROKEN';
 </script>
 
 <g opacity={visible ? 1 : 0} class:text-purple-800={$state.type === 'ACTIVE'}>
+  <defs>
+    <marker
+      id="{id}-triangle-right"
+      viewBox="0 0 10 10"
+      refX="0"
+      refY="5"
+      markerUnits="userSpaceOnUse"
+      markerWidth="9"
+      markerHeight="9"
+      orient="auto"
+    >
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+    </marker>
+
+    <marker
+      id="{id}-triangle-down"
+      viewBox="0 0 10 10"
+      refX="0"
+      refY="5"
+      markerUnits="userSpaceOnUse"
+      markerWidth="9"
+      markerHeight="9"
+      orient="90"
+    >
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+    </marker>
+
+    <marker
+      id="{id}-triangle-up"
+      viewBox="0 0 10 10"
+      refX="0"
+      refY="5"
+      markerUnits="userSpaceOnUse"
+      markerWidth="9"
+      markerHeight="9"
+      orient="-90"
+    >
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+    </marker>
+  </defs>
+
   <path
     {d}
     stroke="currentColor"
-    stroke-width={$state.type === 'ACTIVE' ? 2 : 1}
-    stroke-dasharray="2"
+    stroke-width={$state.type === 'ACTIVE' ? 3 : 2}
     fill="transparent"
-    marker-end={`url(#triangle-${arrowDir})`}
+    marker-end={`url(#${id}-triangle-${arrowDir})`}
   />
 
   {#if broken}
     <text x={x1 + (x2 - x1) / 2} y={y1 + (y2 - y1) / 2} text-anchor="middle">❌</text>
   {/if}
-
+  <!--
   {#if running}
     <circle r="3" fill="currentColor">
       <animateMotion
@@ -156,5 +199,5 @@
         fill="freeze"
       />
     </circle>
-  {/if}
+  {/if} -->
 </g>

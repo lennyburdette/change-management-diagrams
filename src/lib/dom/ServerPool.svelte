@@ -4,6 +4,7 @@
   import { createMachine, assign, EventData } from 'xstate';
   import { useMachine } from '$lib/fsm';
   import Server from './Server.svelte';
+  import { fly } from 'svelte/transition';
 
   const boxes = getBoxes();
 
@@ -155,38 +156,42 @@
     { old: schema, new: $state.context.schema },
     { old: code, new: $state.context.code }
   );
+
+  $: visible = $stateMessages.type !== 'HIDE';
 </script>
 
-<div class="grid justify-center">
-  <div class="text-center">
-    {name}
-    {#if cluster}
-      <span
-        class="px-1 rounded-sm bg-blue-500 text-white text-xs uppercase"
-        class:bg-blue-500={cluster === 'Blue'}
-        class:bg-green-500={cluster === 'Green'}
-      >
-        {cluster}
-      </span>
-    {/if}
-  </div>
-  <div
-    class="border border-gray-300 bg-white rounded shadow transition-all"
-    use:registerBox={{ id, boxes }}
-    class:bg-brand-light={$state.context.active}
-    class:border-brand-dark={$state.context.active}
-    class:shadow-lg={$state.context.active}
-    class:-translate-y-1={$state.context.active}
-  >
-    {#if variant}
-      <div class="px-1 text-xs border-b bg-gray-300 text-gray-800 text-center rounded">
-        Variant: {variant}
+{#if visible}
+  <div in:fly out:fly class="grid justify-center">
+    <div class="text-center text-xl">
+      {name}
+      {#if cluster}
+        <span
+          class="px-1 rounded-sm bg-blue-500 text-white text-xs uppercase"
+          class:bg-blue-500={cluster === 'Blue'}
+          class:bg-green-500={cluster === 'Green'}
+        >
+          {cluster}
+        </span>
+      {/if}
+    </div>
+    <div
+      class="border border-gray-200 bg-white rounded shadow overflow-hidden transition-all"
+      use:registerBox={{ id, boxes }}
+      class:bg-brand-light={$state.context.active}
+      class:border-brand-dark={$state.context.active}
+      class:shadow-lg={$state.context.active}
+      class:-translate-y-1={$state.context.active}
+    >
+      {#if variant}
+        <div class="px-1 text-xs border-b bg-gray-300 text-gray-800 text-center">
+          my-graph@{variant}
+        </div>
+      {/if}
+      <div class="relative p-4 grid grid-flow-col items-stretch gap-1">
+        {#each servers as server}
+          <Server {...server} />
+        {/each}
       </div>
-    {/if}
-    <div class="relative p-2 grid grid-flow-col items-stretch gap-1">
-      {#each servers as server}
-        <Server {...server} />
-      {/each}
     </div>
   </div>
-</div>
+{/if}

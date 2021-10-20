@@ -27,7 +27,7 @@
 </script>
 
 <div
-  class="relative p-6 border rounded-lg"
+  class="relative flex-grow grid place-content-center"
   bind:clientWidth={w}
   bind:clientHeight={h}
   use:registerBox={{ id: 'parent', boxes }}
@@ -39,47 +39,6 @@
     width={w}
     height={h}
   >
-    <defs>
-      <marker
-        id="triangle-right"
-        viewBox="0 0 10 10"
-        refX="10"
-        refY="5"
-        markerUnits="userSpaceOnUse"
-        markerWidth="6"
-        markerHeight="6"
-        orient="auto"
-      >
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-      </marker>
-
-      <marker
-        id="triangle-down"
-        viewBox="0 0 10 10"
-        refX="10"
-        refY="5"
-        markerUnits="userSpaceOnUse"
-        markerWidth="6"
-        markerHeight="6"
-        orient="90"
-      >
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-      </marker>
-
-      <marker
-        id="triangle-up"
-        viewBox="0 0 10 10"
-        refX="10"
-        refY="5"
-        markerUnits="userSpaceOnUse"
-        markerWidth="6"
-        markerHeight="6"
-        orient="-90"
-      >
-        <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-      </marker>
-    </defs>
-
     {#each $lines as line}
       <Connector {...line} />
     {/each}

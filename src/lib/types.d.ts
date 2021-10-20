@@ -13,19 +13,27 @@ export interface Task {
 
 type State =
   | { type: 'DEFAULT' }
-  | { type: 'ACTIVE' }
-  | { type: 'COMPLETE' }
+  | { type: 'ACTIVE'; work?: string; id?: string }
+  | { type: 'COMPLETE'; highlight?: boolean }
   | { type: 'SCHEMA'; schema: string; active: boolean }
-  | { type: 'ROLLING_DEPLOY'; schema: string; code: number }
+  | { type: 'ROLLING_DEPLOY'; servers: { code: number; schema: string }[] }
   | { type: 'DEPLOY'; schema: string; code: number }
   | { type: 'BROKEN' }
   | { type: 'SHOW' }
-  | { type: 'HIDE' };
+  | { type: 'HIDE' }
+  // studio
+  | { type: 'CHECK_PASS' }
+  | { type: 'CHECK_COMPOSITION_FAIL' }
+  | { type: 'CHECK_OPERATIONS_FAIL' }
+  | { type: 'COMPOSE_PASS' }
+  | { type: 'COMPOSE_FAIL' }
+  | { type: 'COMPOSE_CONTRACT' };
 
 export interface Step {
   title: string;
   description?: string;
   states: { [key: string]: State };
+  duration?: number;
 }
 
 export interface Script {
@@ -34,6 +42,7 @@ export interface Script {
   tasks2?: Task[][];
   lines: ConnectorConfig[];
   boxes: WrapperConfig[];
+  slides?: { [key: string]: State }[];
 }
 
 export interface ConnectorConfig {

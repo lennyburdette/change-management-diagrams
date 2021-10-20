@@ -41,3 +41,16 @@ export function reifyStates(steps: Step[]): { [key: string]: State }[] {
 
   return reifiedSteps;
 }
+
+export function reifySteps(steps: Step[]): Step[] {
+  const reifiedSteps: Step[] = [];
+  let previous = {};
+
+  for (const step of steps) {
+    const reified = { ...previous, ...step.states };
+    reifiedSteps.push({ ...step, states: reified });
+    previous = reified;
+  }
+
+  return reifiedSteps;
+}

@@ -17,18 +17,19 @@
 
   $: complete = $state.type === 'COMPLETE';
   $: active = $state.type === 'ACTIVE';
+  $: errored = $state.type === 'BROKEN';
 
   $: schemaVersion = 'schema' in $state && $state.schema;
   $: codeVersion = 'code' in $state && $state.code;
+  $: highlight = ($state.type === 'COMPLETE' && $state.highlight) || active;
 </script>
 
 <div
-  class="relative p-2 px-3 pr-4 border border-gray-300 rounded grid content-center shadow transition-all"
+  class="relative p-2 px-3 pr-4 border-2 border-gray-300 rounded grid content-center shadow transition-all"
   class:pr-4={!terminal}
-  class:border-brand-dark={active}
-  class:bg-brand-light={active}
-  class:shadow-lg={active}
-  class:-translate-y-1={active}
+  class:border-purple-800={highlight}
+  class:shadow-lg={highlight}
+  class:-translate-y-1={highlight}
 >
   <div class="flex items-center gap-1 justify-between">
     <div class="flex items-center gap-1" class:mr-5={icon}>
@@ -36,6 +37,8 @@
         <Spinner />
       {:else if complete}
         <Complete />
+      {:else if errored}
+        ❌
       {:else}
         <Null />
       {/if}
@@ -58,25 +61,24 @@
     {/if}
   </div>
 
-  {#if !terminal}
+  <!-- {#if !terminal}
     <div
       class="absolute top-[50%] right-0 m-[-0.375rem] bg-halfSplit rounded-full w-3 h-3 grid place-content-center transition-all"
-      class:active
+      class:highlight
     >
       <div
-        class="absolute top-[1px] left-[1px] right-[1px] bottom-[1px] bg-white rounded-full transition-all"
-        class:bg-brand-light={active}
+        class="absolute top-[2px] left-[2px] right-[2px] bottom-[2px] bg-white rounded-full transition-all"
       />
       <div
         class="bg-gray-400 rounded-full w-1 h-1 relative transition-all"
-        class:bg-brand-dark={active}
+        class:border-purple-800={highlight}
       />
     </div>
-  {/if}
+  {/if} -->
 </div>
 
 <style>
-  .active {
+  .highlight {
     --color-workflow-card-bg: #ebe6ee;
     --color-border-primary: #391e8a;
   }
