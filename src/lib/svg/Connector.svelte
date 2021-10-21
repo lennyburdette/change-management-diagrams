@@ -8,7 +8,7 @@
   export let hidden: boolean = false;
 
   export let id: string;
-  export let after: string | undefined = undefined;
+  // export let after: string | undefined = undefined;
 
   const state = getState(id);
   $: visible = ['SHOW', 'ACTIVE'].includes($state.type)
@@ -131,11 +131,16 @@
     }
   })();
 
-  $: running = false; // $state.type === 'DEFAULT';
+  // $: running = false; // $state.type === 'DEFAULT';
   $: broken = $state.type === 'BROKEN';
 </script>
 
-<g opacity={visible ? 1 : 0} class:text-purple-800={$state.type === 'ACTIVE'}>
+<g
+  opacity={visible ? 1 : 0}
+  class:text-purple-800={$state.type === 'ACTIVE'}
+  class:text-gray-200={$state.type === 'DIMMED'}
+  class:text-red-600={broken}
+>
   <defs>
     <marker
       id="{id}-triangle-right"
@@ -180,14 +185,15 @@
   <path
     {d}
     stroke="currentColor"
-    stroke-width={$state.type === 'ACTIVE' ? 3 : 2}
+    stroke-width={broken ? 3 : $state.type === 'ACTIVE' ? 3 : 2}
+    stroke-dasharray={broken ? '3,3' : '0'}
     fill="transparent"
     marker-end={`url(#${id}-triangle-${arrowDir})`}
   />
 
-  {#if broken}
+  <!-- {#if broken}
     <text x={x1 + (x2 - x1) / 2} y={y1 + (y2 - y1) / 2} text-anchor="middle">❌</text>
-  {/if}
+  {/if} -->
   <!--
   {#if running}
     <circle r="3" fill="currentColor">

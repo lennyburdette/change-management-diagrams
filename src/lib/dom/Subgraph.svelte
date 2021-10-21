@@ -17,9 +17,9 @@
     const out = [];
     for (let i = 0; i < 3; i++) {
       if (i >= newServers.length) {
-        out.push({ code: code, schema: schema });
+        out.push({ code: code, schema: schema, new: false });
       } else {
-        out.push({ code: newServers[i].code, schema: newServers[i].schema });
+        out.push({ code: newServers[i].code, schema: newServers[i].schema, new: true });
       }
     }
     return out;
@@ -50,8 +50,11 @@
       class:-translate-y-1={active}
     >
       <div class="relative p-4 grid grid-flow-col items-stretch gap-1">
-        {#each servers as server}
-          <Server {...server} />
+        {#each new Array(3).fill(1) as _, i}
+          <div class="relative">
+            <Server {code} {schema} />
+            <Server {code} {schema} {...servers[i] ?? {}} absolute visible={servers[i].new} />
+          </div>
         {/each}
       </div>
     </div>

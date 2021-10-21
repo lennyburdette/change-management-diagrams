@@ -58,38 +58,81 @@
 
 <ProgressBar value={$progress} />
 
-<div class="h-[100vh] flex flex-col space-y-6">
-  <div class="m-6 mb-0 flex flex-row space-x-2 text-sm font-mono">
-    <div class="flex-1">
-      <Step id="task-merge-pr" label="Merge PR" />
+<div class="h-[100vh] flex flex-col space-y-4">
+  <ShowHide id="first-pipeline">
+    <div class="m-6 mb-0">
+      <ShowHide id="first-pipeline-title">
+        <p class="mb-2">Products Release Pipeline</p>
+      </ShowHide>
+      <div class="flex flex-row space-x-2 text-sm font-mono">
+        <div class="flex-1">
+          <Step id="task-merge-pr" label="Merge PR" />
+        </div>
+
+        <div class="flex-1 grid gap-2">
+          <Step id="task-tests" label="Run Tests" />
+          <Step id="task-checks" label="Run Schema Checks" />
+        </div>
+
+        <div class="flex-1 grid gap-2">
+          <Step id="task-build-sdl" label="Build Schema" />
+          <Step id="task-build-artifact" label="Build Deployable" />
+        </div>
+
+        <ShowHide id="task-timer">
+          <div class="h-full grid place-content-center"><Clock /></div>
+        </ShowHide>
+
+        <ShowHide id="task-checks-2-container">
+          <Step id="task-checks-2" label="Run Schema Checks" />
+        </ShowHide>
+
+        <div class="flex-1">
+          <Step id="task-deploy" label="Initiate deploy" />
+        </div>
+
+        <div class="flex-1">
+          <Step id="task-publish" label="Publish schema" terminal />
+        </div>
+      </div>
     </div>
+  </ShowHide>
 
-    <div class="flex-1 grid gap-2">
-      <Step id="task-tests" label="Run Tests" />
-      <Step id="task-checks" label="Run Schema Checks" />
+  <ShowHide id="second-pipeline">
+    <div class="mx-6 mb-0">
+      <p class="mb-2">Reviews Release Pipeline</p>
+      <div class="flex flex-row space-x-2 text-sm font-mono">
+        <div class="flex-1">
+          <Step id="task2-merge-pr" label="Merge PR" />
+        </div>
+
+        <div class="flex-1 grid gap-2">
+          <Step id="task2-tests" label="Run Tests" />
+          <Step id="task2-checks" label="Run Schema Checks">
+            <ShowHide id="checks-bypass">
+              <button
+                class="bg-green-600 text-white px-2 rounded uppercase shadow hover:bg-green-500 hover:translate-y-[-1px] active:bg-green-800 active:translate-y-0"
+                on:click={next}>Skip</button
+              >
+            </ShowHide>
+          </Step>
+        </div>
+
+        <div class="flex-1 grid gap-2">
+          <Step id="task2-build-sdl" label="Build Schema" />
+          <Step id="task2-build-artifact" label="Build Deployable" />
+        </div>
+
+        <div class="flex-1">
+          <Step id="task2-deploy" label="Initiate deploy" />
+        </div>
+
+        <div class="flex-1">
+          <Step id="task2-publish" label="Publish schema" terminal />
+        </div>
+      </div>
     </div>
-
-    <div class="flex-1 grid gap-2">
-      <Step id="task-build-sdl" label="Build Schema" />
-      <Step id="task-build-artifact" label="Build Deployable" />
-    </div>
-
-    <ShowHide id="task-timer">
-      <div class="h-full grid place-content-center"><Clock /></div>
-    </ShowHide>
-
-    <ShowHide id="task-checks-2-container">
-      <Step id="task-checks-2" label="Run Schema Checks" />
-    </ShowHide>
-
-    <div class="flex-1">
-      <Step id="task-deploy" label="Initiate deploy" />
-    </div>
-
-    <div class="flex-1">
-      <Step id="task-publish" label="Publish schema" terminal />
-    </div>
-  </div>
+  </ShowHide>
 
   <TopologyContainer
     lineConfigs={SCRIPT.lines}
@@ -97,7 +140,7 @@
       {
         contain: ['router', 'beta-router', 'subgraph-a', 'subgraph-b', 'database', 'rest'],
         p: 20,
-        pt: 32
+        pt: 38
       }
     ]}
   >
@@ -111,7 +154,7 @@
         <Component id="client" name="Client apps" />
       </div>
 
-      <div>
+      <div class="space-y-4">
         <Router id="beta-router" name="Router" variant="beta" schema="AX" code={1} />
         <Router id="router" name="Router" variant="prod" schema="AX" code={1} />
       </div>

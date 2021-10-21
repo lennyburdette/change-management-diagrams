@@ -14,7 +14,8 @@
 
   $: visible = $state.type !== 'HIDE';
   $: active = $state.type === 'ACTIVE';
-  $: work = $state.type === 'ACTIVE' ? $state.work : undefined;
+  $: work =
+    $state.type === 'ACTIVE' ? $state.work : $state.type === 'DEFAULT' ? $state.work : undefined;
 </script>
 
 {#if visible}

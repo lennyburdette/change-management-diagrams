@@ -4,9 +4,11 @@ import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
 const contextKey = 'BOXES';
+const resizeContext = Symbol('wtf is this for');
 
 export function initBoxes(): void {
   setContext(contextKey, writable(new Map()));
+  setContext(resizeContext, writable(0));
 }
 
 export function getBoxes(): Writable<Map<string, HTMLElement>> {

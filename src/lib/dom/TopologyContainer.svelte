@@ -40,7 +40,9 @@
     height={h}
   >
     {#each $lines as line}
-      <Connector {...line} />
+      {#if line.to && line.from}
+        <Connector {...line} />
+      {/if}
     {/each}
   </svg>
 

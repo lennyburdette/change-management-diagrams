@@ -15,11 +15,11 @@
   const state = getState(id);
 
   $: visible = $state.type !== 'HIDE';
-  $: active = $state.type === 'ACTIVE' || $state.type === 'DEPLOY';
+  $: active = $state.type === 'ACTIVE' || ($state.type === 'DEPLOY' && $state.active);
   $: servers =
     $state.type === 'DEPLOY'
-      ? new Array(3).fill({ code: $state.code, schema: $state.schema })
-      : new Array(3).fill({ code, schema });
+      ? new Array(3).fill({ code: $state.code, schema: $state.schema, new: true })
+      : new Array(3).fill({ code, schema, new: false });
 </script>
 
 {#if visible}
@@ -37,13 +37,16 @@
         </div>
       {/if}
       <div class="relative p-4 grid grid-flow-col items-stretch gap-1">
-        {#each servers as server}
-          <Server {...server} />
+        {#each new Array(3).fill(1) as _, i}
+          <div class="relative">
+            <Server {code} {schema} />
+            <Server {code} {schema} {...servers[i] ?? {}} absolute visible={servers[i].new} />
+          </div>
         {/each}
       </div>
     </div>
-    <div class="text-center text-xl">
+    <!-- <div class="text-center text-xl">
       {name}
-    </div>
+    </div> -->
   </div>
 {/if}

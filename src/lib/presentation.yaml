@@ -21,6 +21,21 @@ _reset: &RESET
   beta-router: { type: HIDE }
   laptop: { type: HIDE }
 
+  c-router-subgraph-a: { type: DEFAULT }
+  c-router-subgraph-b: { type: DEFAULT }
+  c-client-router: { type: DEFAULT }
+
+  second-pipeline: { type: HIDE }
+  first-pipeline-title: { type: HIDE }
+  task2-merge-pr: { type: DEFAULT }
+  task2-tests: { type: DEFAULT }
+  task2-checks: { type: DEFAULT }
+  task2-build-sdl: { type: DEFAULT }
+  task2-build-artifact: { type: DEFAULT }
+  task2-deploy: { type: DEFAULT }
+  task2-publish: { type: DEFAULT }
+  checks-bypass: { type: HIDE }
+
 lines:
   - id: c-client-router
     from: client
@@ -45,6 +60,8 @@ lines:
   - id: c-beta-client-beta-router
     from: beta-client
     to: beta-router
+    fromAnchor: R
+    toAnchor: L
   - id: c-studio-beta-router
     from: studio
     to: beta-router
@@ -169,30 +186,32 @@ steps:
   - states:
       task-publish: { type: COMPLETE }
       studio: { type: DEFAULT }
-      router: { type: DEPLOY, code: 1, schema: BX }
+      router: { type: DEPLOY, code: 1, schema: BX, active: true }
   - states:
-      # router: { type: DEFAULT }
+      router: { type: DEPLOY, code: 1, schema: BX }
       client: { type: ACTIVE }
       # simulate request?
+  - states:
+      slide: { type: ACTIVE, id: SUCCESS }
 
   # section 1.5 - not continuous delivery
   - states:
+      slide: { type: HIDE }
       task-deploy: { type: DEFAULT }
       task-publish: { type: DEFAULT }
       studio: { type: DEFAULT }
       router: { type: DEFAULT }
+      subgraph-a: { type: DEFAULT }
       client: { type: DEFAULT }
       task-timer: { type: DEFAULT }
   - states:
       task-checks-2-container: { type: DEFAULT }
       task-checks-2: { type: DEFAULT }
-  - states:
-      slide: { type: ACTIVE, id: SUCCESS }
-      <<: *RESET
 
   # section 2 - backwards incompatible
   - states:
       slide: { type: ACTIVE, id: BACKWARD_INCOMPATIBLE }
+      <<: *RESET
   - states:
       slide: { type: ACTIVE, id: BACKWARD_INCOMPATIBLE_CODE }
   - states:
@@ -257,8 +276,9 @@ steps:
       slide: { type: ACTIVE, id: SUCCESS }
       studio: { type: DEFAULT }
 
-  # section 3
+  # section 3 - staged releases
   - states:
+      <<: *RESET
       slide: { type: ACTIVE, id: ROLLBACKS }
   - states:
       slide: { type: ACTIVE, id: STAGED_RELEASES }
@@ -268,28 +288,163 @@ steps:
       slide: { type: HIDE }
   - states:
       beta-router: { type: ACTIVE }
-      c-beta-router-subgraph-a: { type: DEFAULT }
-      c-beta-router-subgraph-b: { type: DEFAULT }
+      c-beta-router-subgraph-a: { type: ACTIVE }
+      c-beta-router-subgraph-b: { type: ACTIVE }
+      c-router-subgraph-a: { type: DIMMED }
+      c-router-subgraph-b: { type: DIMMED }
   - states:
       beta-router: { type: DEFAULT }
       beta-client: { type: ACTIVE }
-      c-beta-client-beta-router: { type: DEFAULT }
+      c-beta-client-beta-router: { type: ACTIVE }
+      c-beta-router-subgraph-a: { type: DEFAULT }
+      c-beta-router-subgraph-b: { type: DEFAULT }
+      c-client-router: { type: DIMMED }
   - states:
       beta-client: { type: DEFAULT }
+      c-beta-client-beta-router: { type: DEFAULT }
       task-merge-pr: { type: COMPLETE }
       task-tests: { type: COMPLETE }
       task-checks: { type: COMPLETE }
       task-build-sdl: { type: COMPLETE }
       task-build-artifact: { type: COMPLETE }
       task-deploy: { type: COMPLETE }
-      subgraph-a: { type: DEPLOY }
+      subgraph-a: { type: DEPLOY, code: 3, schema: B }
   - states:
       task-publish: { type: PUBLISH }
       studio: { type: COMPOSE_CONTRACT }
   - states:
-      beta-router: { type: DEPLOY }
-      router: { type: DEPLOY }
+      beta-router: { type: DEPLOY, code: 1, schema: BX }
+      router: { type: DEPLOY, code: 1, schema: BX }
   - states:
-      client: { type: ACTIVE }
+      beta-client: { type: ACTIVE }
   - states:
       slide: { type: ACTIVE, id: REMOVE_TAGS }
+
+  # section 4 - multiple subgraphs
+  - states:
+      slide: { type: ACTIVE, id: MULTIPLE_SUBGRAPHS }
+      <<: *RESET
+  - states:
+      slide: { type: HIDE }
+  - states:
+      second-pipeline: { type: DEFAULT }
+      first-pipeline: { type: DIMMED }
+      first-pipeline-title: { type: DEFAULT }
+  - states:
+      slide: { type: ACTIVE, id: REVIEWS_ADD }
+  - states:
+      slide: { type: HIDE }
+  - states:
+      task2-merge-pr: { type: COMPLETE }
+  - states:
+      task2-tests: { type: COMPLETE }
+  - states:
+      task2-checks: { type: ACTIVE }
+    duration: 800
+  - states:
+      studio: { type: ACTIVE, work: check-composition }
+    duration: 800
+  - states:
+      studio: { type: ACTIVE, work: error }
+      task2-checks: { type: BROKEN }
+  - states:
+      checks-bypass: { type: DEFAULT }
+  - states:
+      task2-checks: { type: COMPLETE }
+      checks-bypass: { type: HIDE }
+      studio: { type: ACTIVE, work: complete }
+  - states:
+      studio: { type: DEFAULT }
+      task2-build-sdl: { type: COMPLETE }
+      task2-build-artifact: { type: COMPLETE }
+  - states:
+      task2-deploy: { type: ACTIVE }
+      subgraph-b: { type: ROLLING_DEPLOY, servers: [{ code: 4, schema: 'Y' }] }
+    duration: 600
+  - states:
+      subgraph-b:
+        { type: ROLLING_DEPLOY, servers: [{ code: 4, schema: 'Y' }, { code: 4, schema: 'Y' }] }
+    duration: 600
+  - states:
+      subgraph-b:
+        {
+          type: ROLLING_DEPLOY,
+          servers: [{ code: 4, schema: 'Y' }, { code: 4, schema: 'Y' }, { code: 4, schema: 'Y' }]
+        }
+  - states:
+      task2-deploy: { type: COMPLETE }
+      c-router-subgraph-a: { type: ACTIVE }
+      subgraph-b: { type: DEPLOY, code: 4, schema: 'Y' }
+  - states:
+      c-router-subgraph-a: { type: DEFAULT }
+      task2-publish: { type: ACTIVE }
+  - states:
+      studio: { type: ACTIVE, work: check-composition }
+    duration: 800
+  - states:
+      studio: { type: ACTIVE, work: error }
+      task2-publish: { type: BROKEN }
+
+  # section 4.5 - products release
+  - states:
+      studio: { type: DEFAULT, work: error }
+      second-pipeline: { type: DIMMED }
+      first-pipeline: { type: DEFAULT }
+      slide: { type: ACTIVE, id: PRODUCTS_REMOVE }
+  - states:
+      slide: { type: HIDE }
+      task-merge-pr: { type: COMPLETE }
+    duration: 500
+  - states:
+      task-tests: { type: COMPLETE }
+    duration: 500
+  - states:
+      task-checks: { type: ACTIVE }
+    duration: 500
+  - states:
+      studio: { type: ACTIVE, work: check-composition }
+    duration: 800
+  - states:
+      studio: { type: ACTIVE, work: check-operations }
+    duration: 800
+  - states:
+      studio: { type: ACTIVE, work: complete }
+      task-checks: { type: COMPLETE }
+  - states:
+      task-build-sdl: { type: COMPLETE }
+      task-build-artifact: { type: COMPLETE }
+  - states:
+      task-deploy: { type: ACTIVE }
+      subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }] }
+    duration: 500
+  - states:
+      subgraph-a:
+        { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }, { code: 3, schema: 'B' }] }
+    duration: 500
+  - states:
+      subgraph-a:
+        {
+          type: ROLLING_DEPLOY,
+          servers: [{ code: 3, schema: 'B' }, { code: 3, schema: 'B' }, { code: 3, schema: 'B' }]
+        }
+      task-deploy: { type: COMPLETE }
+  - states:
+      subgraph-a: { type: DEPLOY, code: 3, schema: B }
+      task-publish: { type: ACTIVE }
+      studio: { type: ACTIVE, work: compose }
+    duration: 800
+  - states:
+      task-publish: { type: COMPLETE }
+      studio: { type: ACTIVE, work: complete }
+  - states:
+      studio: { type: DEFAULT }
+      router: { type: DEPLOY, code: 1, schema: BY, active: true }
+  - states:
+      router: { type: DEPLOY, code: 1, schema: BY, active: false }
+      c-router-subgraph-b: { type: ACTIVE }
+  - states:
+      c-router-subgraph-b: { type: DEFAULT }
+
+  # end
+  - states:
+      slide: { type: ACTIVE, id: THE_END }

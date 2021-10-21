@@ -2,7 +2,7 @@
   import { fly, scale } from 'svelte/transition';
 
   import { getState } from '$lib/dom/state';
-  import { bounceOut, elasticOut } from 'svelte/easing';
+  import { backOut, bounceOut, elasticOut } from 'svelte/easing';
 
   export let id;
   const state = getState(id);
@@ -11,5 +11,11 @@
 </script>
 
 {#if visible}
-  <div in:scale={{ easing: elasticOut, duration: 1000 }} out:fly><slot /></div>
+  <div
+    in:scale={{ easing: backOut, duration: 500 }}
+    out:fly
+    class:opacity-50={$state.type === 'DIMMED'}
+  >
+    <slot />
+  </div>
 {/if}

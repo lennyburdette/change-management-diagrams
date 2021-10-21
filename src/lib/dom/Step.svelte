@@ -46,6 +46,8 @@
       {label}
     </div>
 
+    <slot />
+
     {#if schemaVersion.length > 0}
       <div in:scale={{ easing: backOut }} out:scale class="absolute right-4">
         <Document version={schemaVersion} />

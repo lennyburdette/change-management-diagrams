@@ -12,22 +12,16 @@ export interface Task {
 }
 
 type State =
-  | { type: 'DEFAULT' }
+  | { type: 'DEFAULT'; work?: string }
   | { type: 'ACTIVE'; work?: string; id?: string }
   | { type: 'COMPLETE'; highlight?: boolean }
   | { type: 'SCHEMA'; schema: string; active: boolean }
   | { type: 'ROLLING_DEPLOY'; servers: { code: number; schema: string }[] }
-  | { type: 'DEPLOY'; schema: string; code: number }
+  | { type: 'DEPLOY'; schema: string; code: number; active?: boolean }
   | { type: 'BROKEN' }
   | { type: 'SHOW' }
   | { type: 'HIDE' }
-  // studio
-  | { type: 'CHECK_PASS' }
-  | { type: 'CHECK_COMPOSITION_FAIL' }
-  | { type: 'CHECK_OPERATIONS_FAIL' }
-  | { type: 'COMPOSE_PASS' }
-  | { type: 'COMPOSE_FAIL' }
-  | { type: 'COMPOSE_CONTRACT' };
+  | { type: 'DIMMED' };
 
 export interface Step {
   title: string;
