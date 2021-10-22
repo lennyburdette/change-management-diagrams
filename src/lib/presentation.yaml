@@ -172,8 +172,10 @@ steps:
   - states:
       subgraph-a: { type: DEPLOY, code: 3, schema: B }
       c-client-router: { type: BROKEN }
+      client: { type: ACTIVE }
   - states:
       c-client-router: { type: DEFAULT }
+      client: { type: DEFAULT }
       task-deploy: { type: COMPLETE }
   - states:
       task-publish: { type: ACTIVE }
@@ -310,11 +312,20 @@ steps:
       task-deploy: { type: COMPLETE }
       subgraph-a: { type: DEPLOY, code: 3, schema: B }
   - states:
-      task-publish: { type: PUBLISH }
-      studio: { type: COMPOSE_CONTRACT }
+      task-publish: { type: ACTIVE }
+  - states:
+      studio: { type: ACTIVE, work: compose }
+    duration: 800
+  - states:
+      studio: { type: ACTIVE, work: generate-contract }
+    duration: 800
+  - states:
+      studio: { type: ACTIVE, work: complete }
+  - states:
+      studio: { type: DEFAULT }
+      router: { type: DEPLOY, code: 1, schema: AX }
   - states:
       beta-router: { type: DEPLOY, code: 1, schema: BX }
-      router: { type: DEPLOY, code: 1, schema: BX }
   - states:
       beta-client: { type: ACTIVE }
   - states:
@@ -398,30 +409,32 @@ steps:
   - states:
       task-tests: { type: COMPLETE }
     duration: 500
-  - states:
-      task-checks: { type: ACTIVE }
-    duration: 500
-  - states:
-      studio: { type: ACTIVE, work: check-composition }
-    duration: 800
-  - states:
-      studio: { type: ACTIVE, work: check-operations }
-    duration: 800
+  # - states:
+  #     task-checks: { type: ACTIVE }
+  #   duration: 500
+  # - states:
+  #     studio: { type: ACTIVE, work: check-composition }
+  #   duration: 800
+  # - states:
+  #     studio: { type: ACTIVE, work: check-operations }
+  #   duration: 800
   - states:
       studio: { type: ACTIVE, work: complete }
       task-checks: { type: COMPLETE }
   - states:
       task-build-sdl: { type: COMPLETE }
+  - states:
       task-build-artifact: { type: COMPLETE }
   - states:
       task-deploy: { type: ACTIVE }
       subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }] }
-    duration: 500
   - states:
       subgraph-a:
         { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }, { code: 3, schema: 'B' }] }
-    duration: 500
   - states:
+      c-router-subgraph-a: { type: ACTIVE }
+  - states:
+      c-router-subgraph-a: { type: DEFAULT }
       subgraph-a:
         {
           type: ROLLING_DEPLOY,
@@ -446,5 +459,7 @@ steps:
       c-router-subgraph-b: { type: DEFAULT }
 
   # end
+  - states:
+      slide: { type: ACTIVE, id: KEY_TAKEAWAYS }
   - states:
       slide: { type: ACTIVE, id: THE_END }

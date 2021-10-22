@@ -185,7 +185,7 @@
   <path
     {d}
     stroke="currentColor"
-    stroke-width={broken ? 3 : $state.type === 'ACTIVE' ? 3 : 2}
+    stroke-width={broken ? 4 : $state.type === 'ACTIVE' ? 3 : 2}
     stroke-dasharray={broken ? '3,3' : '0'}
     fill="transparent"
     marker-end={`url(#${id}-triangle-${arrowDir})`}

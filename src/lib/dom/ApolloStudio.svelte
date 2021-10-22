@@ -35,6 +35,8 @@
         <WorkLine>Checking operations…</WorkLine>
       {:else if work === 'compose'}
         <WorkLine>Composing subgraphs…</WorkLine>
+      {:else if work === 'generate-contract'}
+        <WorkLine>Create contract schema…</WorkLine>
       {:else if work === 'complete'}
         <WorkLine big>✅</WorkLine>
       {:else if work === 'error'}

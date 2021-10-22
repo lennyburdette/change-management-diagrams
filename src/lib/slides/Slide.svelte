@@ -9,7 +9,9 @@
   import BackwardIncompatibleCode from './BackwardIncompatibleCode.svelte';
   import FieldUsage from './FieldUsage.svelte';
   import Intro from './Intro.svelte';
+  import KeyTakeaways from './KeyTakeaways.svelte';
   import MultipleSubgraphs from './MultipleSubgraphs.svelte';
+  import OverrideUi from './OverrideUI.svelte';
   import ProductsRemove from './ProductsRemove.svelte';
   import RemoveTags from './RemoveTags.svelte';
   import ReviewsAdd from './ReviewsAdd.svelte';
@@ -43,6 +45,8 @@
         return AddDeprecation;
       case 'FIELD_USAGE':
         return FieldUsage;
+      case 'OVERRIDE_UI':
+        return OverrideUi;
       case 'ROLLBACKS':
         return Rollbacks;
       case 'STAGED_RELEASES':
@@ -57,6 +61,8 @@
         return ReviewsAdd;
       case 'PRODUCTS_REMOVE':
         return ProductsRemove;
+      case 'KEY_TAKEAWAYS':
+        return KeyTakeaways;
       default:
         return Todo;
     }

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import CodeFile from '$lib/dom/CodeFile.svelte';
+
   import { onMount } from 'svelte';
   import { backIn, backOut } from 'svelte/easing';
   import { scale } from 'svelte/transition';
@@ -30,10 +32,12 @@ type Product @key(fields: "id") {
 
 <div class="absolute inset-0 flex flex-col">
   <div class="flex-grow" />
-  <div class="mx-64">
-    <h1 class="text-3xl mb-4">Product subgraph</h1>
-    <pre
-      class="text-2xl font-mono text-gray-700"><code>{code1}{#if !added}<span out:scale={{ easing: backIn, duration: 300 }} class="inline-block font-bold bg-green-100 text-green-900">{addition}</span>{/if}{code2}</code></pre>
+  <div class="mx-auto">
+    <CodeFile>
+      <span slot="title" class="inline-block w-[600px]">Products subgraph</span>
+      <pre
+        class="text-2xl font-mono text-gray-700"><code>{code1}{#if !added}<span out:scale={{ easing: backIn, duration: 300 }} class="inline-block font-bold bg-green-100 text-green-900">{addition}</span>{/if}{code2}</code></pre>
+    </CodeFile>
   </div>
   <div class="flex-grow" />
 </div>
