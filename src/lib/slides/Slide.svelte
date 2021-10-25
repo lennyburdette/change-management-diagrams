@@ -9,6 +9,7 @@
   import BackwardIncompatibleCode from './BackwardIncompatibleCode.svelte';
   import FieldUsage from './FieldUsage.svelte';
   import Intro from './Intro.svelte';
+  import KeyTakeawayBullets from './KeyTakeawayBullets.svelte';
   import KeyTakeaways from './KeyTakeaways.svelte';
   import MultipleSubgraphs from './MultipleSubgraphs.svelte';
   import OverrideUi from './OverrideUI.svelte';
@@ -63,6 +64,8 @@
         return ProductsRemove;
       case 'KEY_TAKEAWAYS':
         return KeyTakeaways;
+      case 'KEY_TAKEAWAY_BULLETS':
+        return KeyTakeawayBullets;
       default:
         return Todo;
     }

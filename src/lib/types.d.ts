@@ -21,7 +21,8 @@ type State =
   | { type: 'BROKEN' }
   | { type: 'SHOW' }
   | { type: 'HIDE' }
-  | { type: 'DIMMED' };
+  | { type: 'DIMMED' }
+  | { type: 'ACTIVE'; work: 'compose-diagram'; a: string; b: string };
 
 export interface Step {
   title: string;

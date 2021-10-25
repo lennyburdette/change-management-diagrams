@@ -4,6 +4,10 @@
   import { getState } from './state';
   import Complete from '$lib/svg/icons/Complete.svelte';
   import WorkLine from './WorkLine.svelte';
+  import Server from './Server.svelte';
+  import Document from '$lib/svg/icons/Document.svelte';
+  import ComposeDiagram from './ComposeDiagram.svelte';
+  import ContractDiagram from './ContractDiagram.svelte';
 
   const boxes = getBoxes();
 
@@ -34,9 +38,13 @@
       {:else if work === 'check-operations'}
         <WorkLine>Checking operations…</WorkLine>
       {:else if work === 'compose'}
-        <WorkLine>Composing subgraphs…</WorkLine>
+        <WorkLine>Composing…</WorkLine>
+      {:else if work === 'compose-diagram'}
+        <WorkLine><ComposeDiagram state={$state} /></WorkLine>
       {:else if work === 'generate-contract'}
         <WorkLine>Create contract schema…</WorkLine>
+      {:else if work === 'contract-diagram'}
+        <WorkLine><ContractDiagram state={$state} /></WorkLine>
       {:else if work === 'complete'}
         <WorkLine big>✅</WorkLine>
       {:else if work === 'error'}

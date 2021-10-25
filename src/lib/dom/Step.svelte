@@ -49,8 +49,8 @@
     <slot />
 
     {#if schemaVersion.length > 0}
-      <div in:scale={{ easing: backOut }} out:scale class="absolute right-4">
-        <Document version={schemaVersion} />
+      <div in:scale={{ easing: backOut }} out:scale class="absolute right-2 text-base">
+        <div class="scale-75"><Document version={schemaVersion} /></div>
       </div>
     {:else if codeVersion}
       <div

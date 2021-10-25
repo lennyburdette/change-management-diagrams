@@ -73,6 +73,9 @@ lines:
   - id: c-beta-router-subgraph-b
     from: beta-router
     to: subgraph-b
+  - id: c-laptop-studio
+    from: laptop
+    to: studio
 
 steps:
   # reset
@@ -147,12 +150,12 @@ steps:
   - states:
       studio: { type: DEFAULT }
       task-checks: { type: COMPLETE, highlight: false }
-      task-build-sdl: { type: COMPLETE, highlight: true }
+      task-build-sdl: { type: COMPLETE, highlight: true, schema: B }
   - states:
-      task-build-sdl: { type: COMPLETE, highlight: false }
-      task-build-artifact: { type: COMPLETE, highlight: true }
+      task-build-sdl: { type: COMPLETE, highlight: false, schema: B }
+      task-build-artifact: { type: COMPLETE, highlight: true, code: 3 }
   - states:
-      task-build-artifact: { type: COMPLETE, highlight: false }
+      task-build-artifact: { type: COMPLETE, highlight: false, code: 3 }
       task-deploy: { type: ACTIVE }
 
   ### deploy subgraph
@@ -182,9 +185,12 @@ steps:
 
   ### compose and launch
   - states:
-      studio: { type: ACTIVE, work: 'compose' }
+      studio: { type: ACTIVE, work: compose }
+    duration: 400
   - states:
-      studio: { type: ACTIVE, work: 'complete' }
+      studio: { type: ACTIVE, work: compose-diagram, a: B, b: X }
+  - states:
+      studio: { type: ACTIVE, work: complete }
   - states:
       task-publish: { type: COMPLETE }
       studio: { type: DEFAULT }
@@ -224,9 +230,9 @@ steps:
   - states:
       task-checks: { type: COMPLETE }
   - states:
-      task-build-sdl: { type: COMPLETE }
+      task-build-sdl: { type: COMPLETE, schema: B }
   - states:
-      task-build-artifact: { type: COMPLETE }
+      task-build-artifact: { type: COMPLETE, code: 3 }
   - states:
       task-deploy: { type: ACTIVE }
       subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }] }
@@ -307,18 +313,22 @@ steps:
       task-merge-pr: { type: COMPLETE }
       task-tests: { type: COMPLETE }
       task-checks: { type: COMPLETE }
-      task-build-sdl: { type: COMPLETE }
-      task-build-artifact: { type: COMPLETE }
+      task-build-sdl: { type: COMPLETE, schema: B }
+      task-build-artifact: { type: COMPLETE, code: 3 }
       task-deploy: { type: COMPLETE }
       subgraph-a: { type: DEPLOY, code: 3, schema: B }
   - states:
       task-publish: { type: ACTIVE }
   - states:
       studio: { type: ACTIVE, work: compose }
-    duration: 800
+    duration: 400
+  - states:
+      studio: { type: ACTIVE, work: 'compose-diagram', a: B, b: X }
   - states:
       studio: { type: ACTIVE, work: generate-contract }
-    duration: 800
+    duration: 400
+  - states:
+      studio: { type: ACTIVE, work: 'contract-diagram', a: BX, c: AX }
   - states:
       studio: { type: ACTIVE, work: complete }
   - states:
@@ -366,8 +376,8 @@ steps:
       studio: { type: ACTIVE, work: complete }
   - states:
       studio: { type: DEFAULT }
-      task2-build-sdl: { type: COMPLETE }
-      task2-build-artifact: { type: COMPLETE }
+      task2-build-sdl: { type: COMPLETE, schema: 'Y' }
+      task2-build-artifact: { type: COMPLETE, code: 4 }
   - states:
       task2-deploy: { type: ACTIVE }
       subgraph-b: { type: ROLLING_DEPLOY, servers: [{ code: 4, schema: 'Y' }] }
@@ -422,15 +432,15 @@ steps:
       studio: { type: ACTIVE, work: complete }
       task-checks: { type: COMPLETE }
   - states:
-      task-build-sdl: { type: COMPLETE }
+      task-build-sdl: { type: COMPLETE, schema: B }
   - states:
-      task-build-artifact: { type: COMPLETE }
+      task-build-artifact: { type: COMPLETE, code: 3 }
   - states:
       task-deploy: { type: ACTIVE }
-      subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }] }
+      subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: A }] }
   - states:
       subgraph-a:
-        { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }, { code: 3, schema: 'B' }] }
+        { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: A }, { code: 3, schema: A }] }
   - states:
       c-router-subgraph-a: { type: ACTIVE }
   - states:
@@ -438,14 +448,17 @@ steps:
       subgraph-a:
         {
           type: ROLLING_DEPLOY,
-          servers: [{ code: 3, schema: 'B' }, { code: 3, schema: 'B' }, { code: 3, schema: 'B' }]
+          servers: [{ code: 3, schema: A }, { code: 3, schema: A }, { code: 3, schema: A }]
         }
       task-deploy: { type: COMPLETE }
   - states:
-      subgraph-a: { type: DEPLOY, code: 3, schema: B }
+      subgraph-a: { type: DEPLOY, code: 3, schema: A }
       task-publish: { type: ACTIVE }
       studio: { type: ACTIVE, work: compose }
-    duration: 800
+    duration: 400
+  - states:
+      studio: { type: ACTIVE, work: compose-diagram, a: B, b: 'Y' }
+    duration: 400
   - states:
       task-publish: { type: COMPLETE }
       studio: { type: ACTIVE, work: complete }
@@ -457,9 +470,53 @@ steps:
       c-router-subgraph-b: { type: ACTIVE }
   - states:
       c-router-subgraph-b: { type: DEFAULT }
+  - states:
+      # reset
+      client: { type: DEFAULT }
+      studio: { type: DEFAULT }
+      rest: { type: DEFAULT }
+      database: { type: DEFAULT }
+      task-merge-pr: { type: DEFAULT }
+      task-tests: { type: DEFAULT }
+      task-checks: { type: DEFAULT }
+      task-build-sdl: { type: DEFAULT }
+      task-build-artifact: { type: DEFAULT }
+      task-deploy: { type: DEFAULT }
+      task-publish: { type: DEFAULT }
+      task-timer: { type: HIDE }
+      task-checks-2: { type: DEFAULT }
+      task2-merge-pr: { type: DEFAULT }
+      task2-tests: { type: DEFAULT }
+      task2-checks: { type: DEFAULT }
+      task2-build-sdl: { type: DEFAULT }
+      task2-build-artifact: { type: DEFAULT }
+      task2-deploy: { type: DEFAULT }
+      task2-publish: { type: DEFAULT }
+
+      first-pipeline: { type: DIMMED }
+
+      laptop: { type: ACTIVE }
+      c-laptop-studio: { type: ACTIVE }
+  - states:
+      studio: { type: ACTIVE, work: compose }
+    duration: 400
+  - states:
+      studio: { type: ACTIVE, work: compose-diagram, a: B, b: 'Y' }
+  - states:
+      studio: { type: ACTIVE, work: complete }
+      laptop: { type: DEFAULT }
+      c-laptop-studio: { type: DEFAULT }
+  - states:
+      studio: { type: DEFAULT }
+      router: { type: DEPLOY, code: 1, schema: BY, active: true }
+  - states:
+      router: { type: DEPLOY, code: 1, schema: BY, active: false }
+      c-router-subgraph-b: { type: ACTIVE }
 
   # end
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAYS }
+  - states:
+      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS }
   - states:
       slide: { type: ACTIVE, id: THE_END }

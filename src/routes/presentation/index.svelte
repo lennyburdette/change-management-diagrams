@@ -174,19 +174,7 @@
 <slot />
 
 <style>
-  .row-2 {
-    grid-template-rows: max-content 1fr;
-  }
-
-  .col-5 {
-    grid-template-columns: 1fr 1fr 1fr max-content 1fr;
-  }
-
   .col-5-flex {
     grid-template-columns: repeat(5, max-content);
-  }
-
-  .col-6 {
-    grid-template-columns: 1fr 1fr 1fr max-content 1fr 1fr;
   }
 </style>
