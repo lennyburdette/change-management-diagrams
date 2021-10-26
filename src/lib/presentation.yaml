@@ -86,6 +86,8 @@ steps:
       slide: { type: ACTIVE, id: AGENDA }
   # section 1
   - states:
+      slide: { type: ACTIVE, id: MAKING_CHANGES }
+  - states:
       slide: { type: ACTIVE, id: BACKWARD_COMPATIBLE }
   - states:
       slide: { type: HIDE }
@@ -211,6 +213,7 @@ steps:
       router: { type: DEFAULT }
       subgraph-a: { type: DEFAULT }
       client: { type: DEFAULT }
+  - states:
       task-timer: { type: DEFAULT }
   - states:
       task-checks-2-container: { type: DEFAULT }
@@ -394,20 +397,20 @@ steps:
         }
   - states:
       task2-deploy: { type: COMPLETE }
-      c-router-subgraph-a: { type: ACTIVE }
       subgraph-b: { type: DEPLOY, code: 4, schema: 'Y' }
-  - states:
-      c-router-subgraph-a: { type: DEFAULT }
       task2-publish: { type: ACTIVE }
   - states:
       studio: { type: ACTIVE, work: check-composition }
     duration: 800
   - states:
       studio: { type: ACTIVE, work: error }
-      task2-publish: { type: BROKEN }
+      task2-publish: { type: COMPLETE }
+  - states:
+      c-router-subgraph-a: { type: ACTIVE }
 
   # section 4.5 - products release
   - states:
+      c-router-subgraph-a: { type: DEFAULT }
       studio: { type: DEFAULT, work: error }
       second-pipeline: { type: DIMMED }
       first-pipeline: { type: DEFAULT }
@@ -419,28 +422,29 @@ steps:
   - states:
       task-tests: { type: COMPLETE }
     duration: 500
-  # - states:
-  #     task-checks: { type: ACTIVE }
-  #   duration: 500
-  # - states:
-  #     studio: { type: ACTIVE, work: check-composition }
-  #   duration: 800
-  # - states:
-  #     studio: { type: ACTIVE, work: check-operations }
-  #   duration: 800
+  - states:
+      task-checks: { type: ACTIVE }
+    duration: 500
+  - states:
+      studio: { type: ACTIVE, work: check-composition }
+    duration: 500
+  - states:
+      studio: { type: ACTIVE, work: check-operations }
+    duration: 500
   - states:
       studio: { type: ACTIVE, work: complete }
       task-checks: { type: COMPLETE }
   - states:
+      studio: { type: DEFAULT }
       task-build-sdl: { type: COMPLETE, schema: B }
   - states:
-      task-build-artifact: { type: COMPLETE, code: 3 }
+      task-build-artifact: { type: COMPLETE, code: 0 }
   - states:
       task-deploy: { type: ACTIVE }
-      subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: A }] }
+      subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 0, schema: A }] }
   - states:
       subgraph-a:
-        { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: A }, { code: 3, schema: A }] }
+        { type: ROLLING_DEPLOY, servers: [{ code: 0, schema: A }, { code: 0, schema: A }] }
   - states:
       c-router-subgraph-a: { type: ACTIVE }
   - states:
@@ -448,17 +452,15 @@ steps:
       subgraph-a:
         {
           type: ROLLING_DEPLOY,
-          servers: [{ code: 3, schema: A }, { code: 3, schema: A }, { code: 3, schema: A }]
+          servers: [{ code: 0, schema: A }, { code: 0, schema: A }, { code: 0, schema: A }]
         }
       task-deploy: { type: COMPLETE }
   - states:
-      subgraph-a: { type: DEPLOY, code: 3, schema: A }
+      subgraph-a: { type: DEPLOY, code: 0, schema: A }
       task-publish: { type: ACTIVE }
       studio: { type: ACTIVE, work: compose }
-    duration: 400
   - states:
       studio: { type: ACTIVE, work: compose-diagram, a: B, b: 'Y' }
-    duration: 400
   - states:
       task-publish: { type: COMPLETE }
       studio: { type: ACTIVE, work: complete }
@@ -470,6 +472,8 @@ steps:
       c-router-subgraph-b: { type: ACTIVE }
   - states:
       c-router-subgraph-b: { type: DEFAULT }
+
+  # 4.9 - laptop
   - states:
       # reset
       client: { type: DEFAULT }
@@ -484,14 +488,14 @@ steps:
       task-deploy: { type: DEFAULT }
       task-publish: { type: DEFAULT }
       task-timer: { type: HIDE }
-      task-checks-2: { type: DEFAULT }
-      task2-merge-pr: { type: DEFAULT }
-      task2-tests: { type: DEFAULT }
-      task2-checks: { type: DEFAULT }
-      task2-build-sdl: { type: DEFAULT }
-      task2-build-artifact: { type: DEFAULT }
-      task2-deploy: { type: DEFAULT }
-      task2-publish: { type: DEFAULT }
+      # task-checks-2: { type: DEFAULT }
+      # task2-merge-pr: { type: DEFAULT }
+      # task2-tests: { type: DEFAULT }
+      # task2-checks: { type: DEFAULT }
+      # task2-build-sdl: { type: DEFAULT }
+      # task2-build-artifact: { type: DEFAULT }
+      # task2-deploy: { type: DEFAULT }
+      # task2-publish: { type: DEFAULT }
 
       first-pipeline: { type: DIMMED }
 
@@ -499,16 +503,19 @@ steps:
       c-laptop-studio: { type: ACTIVE }
   - states:
       studio: { type: ACTIVE, work: compose }
-    duration: 400
+    duration: 800
   - states:
       studio: { type: ACTIVE, work: compose-diagram, a: B, b: 'Y' }
+    duration: 1600
   - states:
       studio: { type: ACTIVE, work: complete }
       laptop: { type: DEFAULT }
       c-laptop-studio: { type: DEFAULT }
+    duration: 800
   - states:
       studio: { type: DEFAULT }
       router: { type: DEPLOY, code: 1, schema: BY, active: true }
+    duration: 800
   - states:
       router: { type: DEPLOY, code: 1, schema: BY, active: false }
       c-router-subgraph-b: { type: ACTIVE }
@@ -518,5 +525,15 @@ steps:
       slide: { type: ACTIVE, id: KEY_TAKEAWAYS }
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS }
+  - states:
+      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 1 }
+  - states:
+      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 2 }
+  - states:
+      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 3 }
+  - states:
+      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 4 }
+  - states:
+      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 5 }
   - states:
       slide: { type: ACTIVE, id: THE_END }

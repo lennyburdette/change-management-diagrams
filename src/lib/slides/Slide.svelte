@@ -11,6 +11,7 @@
   import Intro from './Intro.svelte';
   import KeyTakeawayBullets from './KeyTakeawayBullets.svelte';
   import KeyTakeaways from './KeyTakeaways.svelte';
+  import MakingChanges from './MakingChanges.svelte';
   import MultipleSubgraphs from './MultipleSubgraphs.svelte';
   import OverrideUi from './OverrideUI.svelte';
   import ProductsRemove from './ProductsRemove.svelte';
@@ -26,12 +27,15 @@
   $: visible = $state.type === 'ACTIVE';
 
   $: id = $state.type === 'ACTIVE' ? $state.id : null;
+  $: step = $state.type === 'ACTIVE' ? $state.step : 0;
   $: component = (() => {
     switch (id) {
       case 'INTRO':
         return Intro;
       case 'AGENDA':
         return Agenda;
+      case 'MAKING_CHANGES':
+        return MakingChanges;
       case 'BACKWARD_COMPATIBLE':
         return BackwardCompatible;
       case 'BACKWARD_COMPATIBLE_CODE':
@@ -74,6 +78,6 @@
 
 {#if visible}
   <div in:fly class="fixed inset-0 bg-white grid place-content-center z-40">
-    <svelte:component this={component} {id} />
+    <svelte:component this={component} {id} {step} />
   </div>
 {/if}

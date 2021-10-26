@@ -52,7 +52,7 @@
       <div in:scale={{ easing: backOut }} out:scale class="absolute right-2 text-base">
         <div class="scale-75"><Document version={schemaVersion} /></div>
       </div>
-    {:else if codeVersion}
+    {:else if codeVersion > -1}
       <div
         in:scale={{ easing: backOut }}
         out:scale

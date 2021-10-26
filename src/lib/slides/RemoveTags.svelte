@@ -2,7 +2,7 @@
   import CodeFile from '$lib/dom/CodeFile.svelte';
 
   import { onMount } from 'svelte';
-  import { backIn, backOut } from 'svelte/easing';
+  import { backIn } from 'svelte/easing';
   import { scale } from 'svelte/transition';
 
   const code1 = `type Query {

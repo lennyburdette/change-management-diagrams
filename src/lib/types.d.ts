@@ -13,7 +13,7 @@ export interface Task {
 
 type State =
   | { type: 'DEFAULT'; work?: string }
-  | { type: 'ACTIVE'; work?: string; id?: string }
+  | { type: 'ACTIVE'; work?: string; id?: string; step?: number }
   | { type: 'COMPLETE'; highlight?: boolean }
   | { type: 'SCHEMA'; schema: string; active: boolean }
   | { type: 'ROLLING_DEPLOY'; servers: { code: number; schema: string }[] }
@@ -21,8 +21,7 @@ type State =
   | { type: 'BROKEN' }
   | { type: 'SHOW' }
   | { type: 'HIDE' }
-  | { type: 'DIMMED' }
-  | { type: 'ACTIVE'; work: 'compose-diagram'; a: string; b: string };
+  | { type: 'DIMMED' };
 
 export interface Step {
   title: string;
