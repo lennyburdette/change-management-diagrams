@@ -21,6 +21,7 @@
   import StagedReleases from './StagedReleases.svelte';
   import Success from './Success.svelte';
   import TagDirectives from './TagDirectives.svelte';
+  import Terms from './Terms.svelte';
   import Todo from './Todo.svelte';
 
   const state = getState('slide');
@@ -36,6 +37,8 @@
         return Agenda;
       case 'MAKING_CHANGES':
         return MakingChanges;
+      case 'TERMS':
+        return Terms;
       case 'BACKWARD_COMPATIBLE':
         return BackwardCompatible;
       case 'BACKWARD_COMPATIBLE_CODE':
@@ -78,6 +81,6 @@
 
 {#if visible}
   <div in:fly class="fixed inset-0 bg-white grid place-content-center z-40">
-    <svelte:component this={component} {id} {step} />
+    <svelte:component this={component} {step} />
   </div>
 {/if}

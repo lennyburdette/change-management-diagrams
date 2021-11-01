@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   import { initStates, reifySteps } from '$lib/dom/state';
   import { initBoxes } from '$lib/dom/boxContext';
@@ -17,6 +17,8 @@
   import { initPlayer } from '$lib/slides/player';
   import ShowHide from '$lib/dom/ShowHide.svelte';
   import Clock from '$lib/svg/icons/Clock.svelte';
+  import SlackMessage from '$lib/dom/SlackMessage.svelte';
+  import Hooray from '$lib/dom/Hooray.svelte';
 
   const reifiedSteps = reifySteps(SCRIPT.steps);
 
@@ -27,12 +29,19 @@
 
   $: $stateStore = $currentStep?.states;
 
+  let notesWindow: Window | undefined;
   onMount(() => {
     if (window.location.hash) {
       const index = parseInt(window.location.hash.slice(1), 10);
       if (!isNaN(index)) jump(index);
     }
-    index.subscribe((s) => (window.location.hash = `${s}`));
+    index.subscribe((s) => {
+      window.location.hash = `${s}`;
+      console.log('update');
+      notesWindow?.postMessage({ index: s }, '*');
+    });
+
+    notesWindow = window.open('', 'presentationnotes');
 
     document.addEventListener(
       'keydown',
@@ -47,10 +56,22 @@
           } else if (document.exitFullscreen) {
             document.exitFullscreen();
           }
+        } else if (e.key === 'z') {
+          notesWindow = window.open('/presentation/notes', 'presentationnotes');
         }
       },
       false
     );
+
+    window.addEventListener('message', ({ data }) => {
+      if (data === 'refresh') {
+        index.subscribe((s) => notesWindow?.postMessage({ index: s }, '*'))();
+      } else if (data === 'next') {
+        next();
+      } else if (data === 'prev') {
+        prev();
+      }
+    });
   });
 </script>
 
@@ -71,11 +92,11 @@
 
         <div class="flex-1 grid gap-2">
           <Step id="task-tests" label="Run Tests" />
-          <Step id="task-checks" label="Run Schema Checks" />
+          <Step id="task-checks" label="rover subgraph check" />
         </div>
 
         <div class="flex-1 grid gap-2">
-          <Step id="task-build-sdl" label="Build Schema" />
+          <Step id="task-build-sdl" label="Build Subgraph SDL" />
           <Step id="task-build-artifact" label="Build Deployable" />
         </div>
 
@@ -84,15 +105,15 @@
         </ShowHide>
 
         <ShowHide id="task-checks-2-container">
-          <Step id="task-checks-2" label="Run Schema Checks" />
+          <Step id="task-checks-2" label="rover subgraph check" />
         </ShowHide>
 
         <div class="flex-1">
-          <Step id="task-deploy" label="Initiate deploy" />
+          <Step id="task-deploy" label="Initiate Deploy" />
         </div>
 
         <div class="flex-1">
-          <Step id="task-publish" label="Publish schema" terminal />
+          <Step id="task-publish" label="rover subgraph publish" terminal />
         </div>
       </div>
     </div>
@@ -108,27 +129,20 @@
 
         <div class="flex-1 grid gap-2">
           <Step id="task2-tests" label="Run Tests" />
-          <Step id="task2-checks" label="Run Schema Checks">
-            <ShowHide id="checks-bypass">
-              <button
-                class="bg-green-600 text-white px-2 rounded uppercase shadow hover:bg-green-500 hover:translate-y-[-1px] active:bg-green-800 active:translate-y-0"
-                on:click={next}>Skip</button
-              >
-            </ShowHide>
-          </Step>
+          <Step id="task2-checks" label="rover subgraph check" hasSkip />
         </div>
 
         <div class="flex-1 grid gap-2">
-          <Step id="task2-build-sdl" label="Build Schema" />
+          <Step id="task2-build-sdl" label="Build Subgraph SDL" />
           <Step id="task2-build-artifact" label="Build Deployable" />
         </div>
 
         <div class="flex-1">
-          <Step id="task2-deploy" label="Initiate deploy" />
+          <Step id="task2-deploy" label="Initiate Deploy" />
         </div>
 
         <div class="flex-1">
-          <Step id="task2-publish" label="Publish schema" terminal />
+          <Step id="task2-publish" label="rover subgraph publish" terminal />
         </div>
       </div>
     </div>
@@ -170,6 +184,9 @@
       </div>
     </div>
   </TopologyContainer>
+
+  <SlackMessage id="slack" />
+  <Hooray />
 </div>
 <slot />
 

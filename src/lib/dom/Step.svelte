@@ -14,6 +14,7 @@
   export let icon: boolean = false;
 
   const state = getState(id);
+  const _skipState = getState('checks-bypass');
 
   $: complete = $state.type === 'COMPLETE';
   $: active = $state.type === 'ACTIVE';
@@ -22,10 +23,13 @@
   $: schemaVersion = 'schema' in $state && $state.schema;
   $: codeVersion = 'code' in $state && $state.code;
   $: highlight = ($state.type === 'COMPLETE' && $state.highlight) || active;
+
+  export let hasSkip = false;
+  $: showSkip = hasSkip && $_skipState.type !== 'HIDE';
 </script>
 
 <div
-  class="relative p-2 px-3 pr-4 border-2 border-gray-300 rounded grid content-center shadow transition-all"
+  class="relative p-2 px-3 pr-8 border-2 border-gray-300 rounded grid content-center shadow transition-all"
   class:pr-4={!terminal}
   class:border-purple-800={highlight}
   class:shadow-lg={highlight}
@@ -33,20 +37,20 @@
 >
   <div class="flex items-center gap-1 justify-between">
     <div class="flex items-center gap-1" class:mr-5={icon}>
-      {#if active && !complete}
-        <Spinner />
-      {:else if complete}
-        <Complete />
-      {:else if errored}
-        ❌
-      {:else}
-        <Null />
-      {/if}
+      <div class="flex-shrink-0">
+        {#if active && !complete}
+          <Spinner />
+        {:else if complete}
+          <Complete />
+        {:else if errored}
+          ❌
+        {:else}
+          <Null />
+        {/if}
+      </div>
 
       {label}
     </div>
-
-    <slot />
 
     {#if schemaVersion.length > 0}
       <div in:scale={{ easing: backOut }} out:scale class="absolute right-2 text-base">
@@ -60,6 +64,16 @@
       >
         &nbsp;
       </div>
+    {/if}
+
+    {#if showSkip}
+      <button
+        in:scale={{ easing: backOut }}
+        out:scale
+        class="absolute right-2 top-2 bg-green-600 text-white px-2 rounded uppercase shadow hover:bg-green-500 hover:translate-y-[-1px] active:bg-green-800 active:translate-y-0"
+      >
+        Skip
+      </button>
     {/if}
   </div>
 
