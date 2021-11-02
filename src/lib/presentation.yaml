@@ -86,15 +86,16 @@ steps:
       slide: { type: ACTIVE, id: INTRO }
       <<: *RESET
     notes: |
-      Welcome to the end of day 1 of GraphQL Summit! Thanks for coming to our
-      presentation on Change Management with Apollo Federation
+      Hello everyone, thanks for coming to our presentation on Change Management
+      with Apollo Federation!
   - states:
       slide: { type: ACTIVE, id: AGENDA }
     notes: |
-      My name is Lenny Burdette and I'm a Solutions Architect at Apollo. I'm
-      going to go over a few change management scenarios before I had it over
-      to Mark Faga from Wayfair, who will describe how they're putting these
-      principles into practice to create an exceptional developer experience.
+      My name is Lenny Burdette, my pronouns are he/him/his, and I'm a Solutions Architect at
+      Apollo. I'm going to go over a few change management scenarios before I
+      had it over to Mark Faga from Wayfair, who will describe how they're
+      putting these principles into practice to create an exceptional developer
+      experience.
   - states:
       slide: { type: ACTIVE, id: MAKING_CHANGES }
     notes: |
@@ -112,43 +113,16 @@ steps:
       schema changes work with Managed Federation. So I wanted to take this
       opportunity to visualize a few change management scenarios to help out
       anyone else struggling with this.
-  # - states:
-  #     slide: { type: ACTIVE, id: TERMS, step: 1 }
-  #   notes: |
-  #     A note before I start: I'm assuming you're familiar with the following
-  #     concepts.
+  - states:
+      slide: { type: ACTIVE, id: SCENARIOS }
+    endSection: true
 
-  #     [CLICK] Apollo Studio is our cloud platform and includes a schema registry.
-
-  #     [CLICK] Managed Federation is the system that uses the schema registry to
-  #     make live updates to your GraphQL API as your subgraphs change.
-
-  #     [CLICK] The router, sometimes called the gateway, takes a single GraphQL
-  #     request and breaks it into smaller requests to be fulfilled by subgraphs.
-
-  #     [CLICK] Subgraphs are the GraphQL services you and your teams build.
-
-  #     [CLICK] Subgraph checks and publishes are commands that use the schema
-  #     registry to validate and publish new subgraph schema.s
-
-  #     [CLICK] Rover is our Command Line tool for performing checks and publishes.
-
-  # - states:
-  #     slide: { type: ACTIVE, id: TERMS, step: 2 }
-  # - states:
-  #     slide: { type: ACTIVE, id: TERMS, step: 3 }
-  # - states:
-  #     slide: { type: ACTIVE, id: TERMS, step: 4 }
-  # - states:
-  #     slide: { type: ACTIVE, id: TERMS, step: 5 }
-  # - states:
-  #     slide: { type: ACTIVE, id: TERMS, step: 6 }
   # section 1
   - states:
       slide: { type: ACTIVE, id: BACKWARD_COMPATIBLE }
     notes: |
       Let's start with the most obvious and probably most common scenario: a backward
-      compatible schema change change.
+      compatible schema change.
   - states:
       slide: { type: HIDE }
     notes: |
@@ -159,7 +133,7 @@ steps:
       client: { type: ACTIVE }
       c-client-router: { type: ACTIVE }
       router: { type: ACTIVE }
-    notes: Client applications make GraphQL requests to the router
+    notes: Client applications make GraphQL requests to the router (sometimes called the gateway)
   - states:
       client: { type: DEFAULT }
       c-client-router: { type: DEFAULT }
@@ -214,7 +188,7 @@ steps:
       task-checks: { type: ACTIVE, highlight: true }
       studio: { type: ACTIVE }
     notes: |
-      It should also use Rover to run a Subgraph Check against the
+      It should also use the Rover command line tool to run a Subgraph Check against the
       Schema Registry. The Subgraph Check will
       confirm that our changes won't affect existing operations (which it won't
       because adding a field is backward-compatible), and that our changes are
@@ -241,7 +215,7 @@ steps:
       studio: { type: DEFAULT }
       task-checks: { type: COMPLETE, highlight: false }
       task-build-sdl: { type: COMPLETE, highlight: true, schema: B }
-    notes: We'll generate the subgraph SDL for publishing.
+    notes: We'll generate the subgraph SDL for publishing to the schema registry.
   - states:
       task-build-sdl: { type: COMPLETE, highlight: false, schema: B }
       task-build-artifact: { type: COMPLETE, highlight: true, code: 3 }
@@ -287,10 +261,10 @@ steps:
       time, some part of the system would reject it.
 
       But that's ok! Remember that GraphQL's declarative query language requires
-      that clients specify exactly fields that they need. We haven't announced
-      to any clients that the new field is available, so there are no client
-      operations that contain that field. As Mark said to me a few months ago:
-        "It's not like clients are polling your GraphQL introspection response
+      that clients specify exactly fields that they need, and they won't get
+      anything they don't ask for. We haven't updated our client apps to use the
+      new field, so this is not a situation we encounter in practice. Mark put it
+      a clever way a while back: "It's not like clients are polling your GraphQL introspection response
         looking for new fields to immediately call."
 
       This failure scenario is not something we can easily get into.
@@ -302,7 +276,7 @@ steps:
       task-publish: { type: ACTIVE }
     notes: |
       Once our subgraph replicas have rolled out, the release process continues
-      and publishes the subgraph schema to Apollo Studio.
+      and we publish the subgraph schema to Apollo Studio.
 
   ### compose and launch
   - states:
@@ -347,7 +321,7 @@ steps:
       subgraph-a: { type: DEFAULT }
       client: { type: DEFAULT }
     notes: |
-      It's worth going back a step and considering what happens if we do not
+      It's worth going back a couple steps and considering what's different if we do not
       practice continuous delivery, and instead trigger deployments manually
       or as part of a release train.
   - states:
@@ -362,6 +336,9 @@ steps:
       We'll want to run Schema Checks again before deploying and publishing to
       make sure another team hasn't released a subgraph change that's
       incompatible with our change.
+
+      But otherwise it's the same.
+    endSection: true
 
   # section 2 - backwards incompatible
   - states:
@@ -381,9 +358,8 @@ steps:
     notes: We've merged our pull request and the release process starts.
   - states:
       task-tests: { type: COMPLETE }
-    duration: 400
     notes: |
-      Tests and checks run, and we build our artifacts.
+      Tests and checks run, we build our artifacts...
   - states:
       task-checks: { type: COMPLETE }
     duration: 400
@@ -392,13 +368,13 @@ steps:
     duration: 400
   - states:
       task-build-artifact: { type: COMPLETE, code: 3 }
-    duration: 400
+    duration: 1200
   - states:
       task-deploy: { type: ACTIVE }
       subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }] }
     duration: 800
     notes: |
-      The deployment process for our subgraph code starts. We're again in an inconsistent state, where the subgraphs' schema no longer contains the field but the router's supergraph schema does.s
+      and the deployment of our subgraph code starts.
   - states:
       subgraph-a:
         { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }, { code: 3, schema: 'B' }] }
@@ -409,23 +385,33 @@ steps:
           type: ROLLING_DEPLOY,
           servers: [{ code: 3, schema: 'B' }, { code: 3, schema: 'B' }, { code: 3, schema: 'B' }]
         }
+    notes: |
+      We're again in an inconsistent state, where the subgraphs' schema no longer contains the field but the router's supergraph schema does.
   - states:
       subgraph-a: { type: DEPLOY, code: 3, schema: B }
+      client: { type: ACTIVE }
+      c-client-router: { type: ACTIVE }
       c-router-subgraph-a: { type: BROKEN }
     notes: |
       If a client makes an operation containing the removed field, in this case the router will allow it, sending a request to the Products subgraph, which will then respond with an error. This may cause the entire request to fail.
 
       But! Why are we removing a field that's actively being used?!
   - states:
+      client: { type: DEFAULT }
+      c-client-router: { type: DEFAULT }
       c-router-subgraph-a: { type: DEFAULT }
       slide: { type: ACTIVE, id: ADD_DEPRECATION }
     notes: |
-      [REWRITE] Before we make any backward-incompatible change, we should go through the entire deprecation process, observe field usage, and only make the change after field usage has dropped to an acceptable level. With Apollo Studio's field usage reporting, we know how often this field is used, by which clients, and in which operations.
+      Before we make any breaking change, we should go through the deprecation process. We start by adding the deprecated directive to our schema, informing clients that this field should no longer be relied on.
   - states:
       slide: { type: ACTIVE, id: FIELD_USAGE }
+    notes: |
+      We'll then use Apollo's field usage information to observe when usage drops to zero or some acceptable level. Apollo lets us know which clients are using the field, so we can reach out to inform them about the deprecation.
   - states:
       slide: { type: HIDE }
       client: { type: ACTIVE }
+    notes: |
+      Now that we've update our clients to remove the field, we can perform our release. The fact that our system may be inconsistent for a period of time is not a problem, because clients can no longer trigger the failure scenario we covered a moment ago.
   - states:
       client: { type: DEFAULT }
       task-checks: { type: ACTIVE }
@@ -444,11 +430,11 @@ steps:
       studio: { type: ACTIVE, work: error }
       task-checks: { type: BROKEN }
     notes: |
-      [REWRITE] During the Schema Check step of the release process, if we are receiving operations from deprecated clients that we intend to break,
+      If we couldn't get field usage to zero, but we know that the clients using the field are unsupported, our Subgraph Check will fail at this point during CI.
   - states:
       slide: { type: ACTIVE, id: OVERRIDE_UI }
     notes: |
-      we'll need to override the Operation Check in Studio before the release can continue. Studio's UI makes this very easy.
+      We can jump into Studio to see the details about the failed check. The interface allows us to mark expected failures from unsupported clients as resolved, allowing the release to continue.
   - states:
       slide: { type: HIDE }
       task-checks: { type: COMPLETE }
@@ -457,43 +443,60 @@ steps:
       hooray: { type: ACTIVE }
       studio: { type: DEFAULT }
     notes: |
-      And now we've released our backwards-incompatible change and performed some garbage collection on our API. Hooray!
+      And now we've released our breaking change and cleaned up our API. Hooray!
+    endSection: true
 
   # section 3 - staged releases
   - states:
       <<: *RESET
       slide: { type: ACTIVE, id: ROLLBACKS }
     notes: |
-      I often get questions about performing a rollback if we encounter problems with these deployments. But what does it mean to rollback an API change? Rolling back a field addition becomes a backward-incompatible change, breaking all clients now depending on this field in their operations. Definitely something we want to avoid!
+      I often get questions about performing rollbacks if we encounter problems with these deployments. But what does it mean to rollback an API change? Rolling back a field addition becomes a field removal change, breaking all clients now depending on this field in their operations. This is definitely something we want to avoid!
 
       (As an aside, this is one of the reasons why we suggest keeping subgraphs separate from  underlying services — if you co-mingle schema changes with other kinds of logic and data changes and need to rollback both, you get into a very awkward situation!)
   - states:
       slide: { type: ACTIVE, id: STAGED_RELEASES }
     notes: |
-      Instead of rolling back our schema, a better process is to release our changes in stages, like alpha, beta, and generally available. After we sufficiently test new fields with preview clients, we'll have significantly more confidence in the change before releasing it to everyone.
+      Instead of rolling back our schema, a better process is to release our change in stages. After we sufficiently test new fields with preview clients, we'll have significantly more confidence in the change, and we're less likely to need rollbacks at all.
+
+      Apollo's new "contracts" feature makes this very easy:
   - states:
       slide: { type: ACTIVE, id: TAG_DIRECTIVES }
     notes: |
-      Apollo's "contracts" feature makes this very easy: simply "tag" our new field to indicate that it's only intended for beta clients.
+      we start by "tagging" our new field to indicate that it's only intended for beta clients.
   - states:
       slide: { type: HIDE }
   - states:
-      beta-router: { type: ACTIVE }
+      router: { type: DEFAULT, hideName: true }
+      beta-router: { type: ACTIVE, hideName: true }
       c-beta-router-subgraph-a: { type: ACTIVE }
       c-beta-router-subgraph-b: { type: ACTIVE }
       c-router-subgraph-a: { type: DIMMED }
       c-router-subgraph-b: { type: DIMMED }
     notes: |
-      The release process is exactly the same, but we're running two routers in our cluster.
+      The release process is exactly the same, but we're running two routers in our cluster. One router uses our beta schema,
   - states:
-      beta-router: { type: DEFAULT }
       beta-client: { type: ACTIVE }
       c-beta-client-beta-router: { type: ACTIVE }
       c-beta-router-subgraph-a: { type: DEFAULT }
       c-beta-router-subgraph-b: { type: DEFAULT }
       c-client-router: { type: DIMMED }
+    notes: and serves beta clients,
   - states:
-      beta-client: { type: DEFAULT }
+      beta-router: { type: DEFAULT, hideName: true }
+      beta-client: { type: DEFAULT, hideName: true }
+      c-beta-client-beta-router: { type: DEFAULT }
+      c-beta-router-subgraph-a: { type: DEFAULT }
+      c-beta-router-subgraph-b: { type: DEFAULT }
+      c-client-router: { type: ACTIVE }
+      client: { type: ACTIVE }
+      router: { type: ACTIVE, hideName: true }
+    notes: while the other router serves our generally-available schema for everyone else.
+  - states:
+      beta-client: { type: DEFAULT, hideName: true }
+      c-client-router: { type: DEFAULT }
+      client: { type: DEFAULT }
+      router: { type: DEFAULT, hideName: true }
       c-beta-client-beta-router: { type: DEFAULT }
       task-merge-pr: { type: COMPLETE }
       task-tests: { type: COMPLETE }
@@ -502,6 +505,7 @@ steps:
       task-build-artifact: { type: COMPLETE, code: 3 }
       task-deploy: { type: COMPLETE }
       subgraph-a: { type: DEPLOY, code: 3, schema: B }
+    notes: Our release pipeline is exactly the same up through the subgraph deploy.
   - states:
       task-publish: { type: ACTIVE }
     notes: |
@@ -512,7 +516,7 @@ steps:
   - states:
       studio: { type: ACTIVE, work: 'compose-diagram', a: B, b: X }
     notes: |
-      [REWRITE] a beta supergraph containing the field, accessible only to beta clients through their router,
+      a beta supergraph containing the field, accessible only to beta clients through their router,
   - states:
       studio: { type: ACTIVE, work: generate-contract }
     duration: 400
@@ -521,39 +525,51 @@ steps:
     notes: |
       and a GA supergraph still without the field.
   - states:
-      studio: { type: ACTIVE, work: complete }
-  - states:
       studio: { type: DEFAULT }
-      router: { type: DEPLOY, code: 1, schema: AX }
+      c-studio-router: { type: ACTIVE }
+      c-studio-beta-router: { type: ACTIVE }
+      router: { type: DEPLOY, code: 1, schema: AX, hideName: true }
+      beta-router: { type: DEPLOY, code: 1, schema: BX, hideName: true }
+      task-publish: { type: COMPLETE }
+    notes: This launch updates both routers (though the generally available schema doesn't actually change),
   - states:
-      beta-router: { type: DEPLOY, code: 1, schema: BX }
-  - states:
+      c-studio-router: { type: DEFAULT }
+      c-studio-beta-router: { type: DEFAULT }
       beta-client: { type: ACTIVE }
-    notes: |
-      [REWRITE] Once we're sure the new schema and code are good to go, we can release another change removing the tag.
+      c-beta-client-beta-router: { type: ACTIVE }
+    notes: And we can start testing our new field in beta clients.
   - states:
       slide: { type: ACTIVE, id: REMOVE_TAGS }
+    notes: Once we're sure the new schema and code are good to go, we can release another change removing the tag.
   - states:
       hooray: { type: ACTIVE }
+    endSection: true
 
   # section 4 - multiple subgraphs
   - states:
       slide: { type: ACTIVE, id: MULTIPLE_SUBGRAPHS }
       <<: *RESET
     notes: |
-      The last scenario I want to cover is coordinating schema changes across multiple subgraphs. There are a few reasons you might need to change multiple subgraph schemas together. Some of those reasons, like keeping an Enum type in sync, will get significantly easier with Federation 2, which we announced earlier today.
+      The last scenario I want to cover is coordinating schema changes across multiple subgraphs. There are a few reasons you might need to change multiple subgraph simultaneously. Some of those reasons, like keeping an Enum type in sync, will get significantly easier with Federation 2, which we announced earlier today.
   - states:
       slide: { type: HIDE }
     notes: |
       For this talk, we'll focus on what we call the "schema shuffle", moving a field from one subgraph to another. We'll walk through this change using the Federation 1 composition model that's available today.
 
-      One important note about this change: the GraphQL API that our client apps use does not change. Instead, only the metadata used for federation query planning changes. It's always a good idea to isolate API changes from query planning changes.
+      One important note about this change: the GraphQL API that our client apps use is not changing. Instead, only the metadata used for federation query planning changes. It's always a good idea to isolate API changes from query planning changes.
   - states:
+      subgraph-a: { type: ACTIVE }
+      subgraph-b: { type: ACTIVE }
+    notes: |
+      Let's say we're migrating a field from the Products subgraph to the Reviews subgraph. When planning this migration, it's important to sequence the steps so that at some point, both subgraphs are capable of resolving the field. The Products subgraph already resolves it, so we'll start with the Reviews subgraph.
+  - states:
+      subgraph-a: { type: DEFAULT }
+      subgraph-b: { type: DEFAULT }
       second-pipeline: { type: DEFAULT }
       first-pipeline: { type: DIMMED }
       first-pipeline-title: { type: DEFAULT }
     notes: |
-      Let's say we're migrating a field from the Products subgraph to the Reviews subgraph. When planning this migration, it's important to sequence the steps so that at some point, both subgraphs are capable of resolving the field. The Products subgraph already resolves it, so we'll start with the Reviews subgraph. We'll need a second release pipeline to track these steps.
+      We'll need a second release pipeline to track these steps.
   - states:
       slide: { type: ACTIVE, id: REVIEWS_ADD }
     notes: |
@@ -593,13 +609,13 @@ steps:
       task2-build-sdl: { type: COMPLETE, schema: 'Y' }
       task2-build-artifact: { type: COMPLETE, code: 4 }
     notes: |
-      Now that we've gotten past the prerelease steps, the release continues as normal. We build our subgraph SDL and deployable artifact, initiate a rolling deploy, and publish our subgraph schema to Apollo Studio.
+      Now that we've gotten past the prerelease steps, the release continues as normal. We build our subgraph SDL and deployable artifacts,
   - states:
       task2-deploy: { type: ACTIVE }
       subgraph-b: { type: ROLLING_DEPLOY, servers: [{ code: 4, schema: 'Y' }] }
     duration: 600
     notes: |
-      - When Apollo Studio receives this subgraph SDL, the change will "fail" to compose and Studio will not deliver a new supergraph to the routers. The routers will continue to use the Products subgraph to resolve the field. But the Reviews subgraph is ready and waiting to receive the traffic.
+      initiate a rolling deploy,
   - states:
       subgraph-b:
         { type: ROLLING_DEPLOY, servers: [{ code: 4, schema: 'Y' }, { code: 4, schema: 'Y' }] }
@@ -614,14 +630,24 @@ steps:
       task2-deploy: { type: COMPLETE }
       subgraph-b: { type: DEPLOY, code: 4, schema: 'Y' }
       task2-publish: { type: ACTIVE }
+    notes: |
+      and publish our subgraph schema to Apollo Studio.
+
   - states:
       studio: { type: ACTIVE, work: check-composition }
     duration: 800
+    notes: |
+      When Apollo Studio receives this subgraph SDL, the change will "fail" to compose and Studio will not deliver a new supergraph to the routers.
   - states:
       studio: { type: ACTIVE, work: error }
       task2-publish: { type: COMPLETE }
+    notes: |
+
   - states:
       c-router-subgraph-a: { type: ACTIVE }
+    notes: |
+      The routers will continue to use the Products subgraph to resolve the field. But the Reviews subgraph is ready and waiting to receive the traffic.
+    endSection: true
 
   # section 4.5 - products release
   - states:
@@ -631,7 +657,11 @@ steps:
       first-pipeline: { type: DEFAULT }
       slide: { type: ACTIVE, id: PRODUCTS_REMOVE }
     notes: |
-      In a separate change, we'll prepare our Products subgraph to relinquish the responsibility of resolving this field. In this case, we want to remove the field from the published subgraph SDL, but we *don't* want to remove it from the Products subgraph or remove the resolver — we'll discuss why in a moment. (When I talked about "building" the subgraph, this is what I mean.)
+      In a separate change, we'll prepare our Products subgraph to relinquish the responsibility of resolving this field.
+
+      In this case, we want to *remove* the field from the schema that we publish,
+
+      but we *don't* want to remove it from the runtime schema or remove the resolver — we'll see why in a moment.
   - states:
       slide: { type: HIDE }
       task-merge-pr: { type: COMPLETE }
@@ -665,13 +695,15 @@ steps:
   - states:
       task-deploy: { type: ACTIVE }
       subgraph-a: { type: ROLLING_DEPLOY, servers: [{ code: 0, schema: A }] }
+    notes: As we rollout the Products code,
+    duration: 800
   - states:
       subgraph-a:
         { type: ROLLING_DEPLOY, servers: [{ code: 0, schema: A }, { code: 0, schema: A }] }
   - states:
       c-router-subgraph-a: { type: ACTIVE }
     notes: |
-      As we rollout the Products code, the router will continue to send traffic for the field to the Product service. This is why we left the resolver in place.
+      the router will continue to send traffic for the field to the Product service. This is why we left the resolver in place.
   - states:
       c-router-subgraph-a: { type: DEFAULT }
       subgraph-a:
@@ -685,23 +717,28 @@ steps:
       task-publish: { type: ACTIVE }
       studio: { type: ACTIVE, work: compose }
     notes: |
-      After the rollout completes, our release system publishes the new Products subgraph SDL to Studio, which can successfully compose the subgraphs. The Launch succeeds and the router now resolves the field using the Reviews subgraph.
+      After the rollout completes, our release system publishes the new Products subgraph SDL to Studio, which can successfully compose the subgraphs.
   - states:
       studio: { type: ACTIVE, work: compose-diagram, a: B, b: 'Y' }
+    duration: 1000
   - states:
       task-publish: { type: COMPLETE }
       studio: { type: ACTIVE, work: complete }
+    duration: 1000
   - states:
       studio: { type: DEFAULT }
       router: { type: DEPLOY, code: 1, schema: BY, active: true }
+    duration: 1000
+    notes: |
+      The Launch succeeds and the router now resolves the field using the Reviews subgraph.
   - states:
       router: { type: DEPLOY, code: 1, schema: BY, active: false }
       c-router-subgraph-b: { type: ACTIVE }
+    notes: |
+      Once we're in a good state, we can finally delete the field resolver from the Products subgraph and release that change. We have successfully shuffled our schema.
   - states:
       c-router-subgraph-b: { type: DEFAULT }
       hooray: { type: ACTIVE }
-    notes: |
-      Once we're in a good state, we can finally delete the field resolver from the Products subgraph. We have successfully shuffled our schema.
 
   # 4.9 - laptop
   - states:
@@ -732,6 +769,8 @@ steps:
 
       laptop: { type: ACTIVE }
       c-laptop-studio: { type: ACTIVE }
+    notes: |
+      With the current version of federation, this process is a bit unwieldy. Some teams choose to simplify it by publishing the schemas from development machines or a separate git repo. As long as you make sure both subgraphs can resolve the field before publishing, this is an easy and safe approach.
   - states:
       studio: { type: ACTIVE, work: compose }
     duration: 800
@@ -750,21 +789,36 @@ steps:
   - states:
       router: { type: DEPLOY, code: 1, schema: BY, active: false }
       c-router-subgraph-b: { type: ACTIVE }
+    notes: |
+      But definitely check out the Federation 2 announcement to learn how this process will get a lot easier very soon!
 
   # end
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAYS }
+    notes: |
+      Before I hand it over to Mark, here are some key takeaways:
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS }
+    duration: 500
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 1 }
+    notes: |
+      The temporary inconsistency that happens during a release doesn't actually matter in practice. This is a huge benefit of the declarative nature of the GraphQL query language.
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 2 }
+    notes: |
+      The deprecation process, assisted by field usage information, is critical to safely making breaking changes.
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 3 }
+    notes: |
+      It's always preferable to isolate changes from one another. For example, try to avoid changing the client API when changing how query planning works.
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 4 }
+    notes: |
+      API "rollbacks" aren't really a thing. Instead, you should release changes in stages using Contracts to prevent needing rollbacks at all.
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 5 }
+    notes: |
+      And finally, check out Federation 2, which we design in large part to make changes like the ones I described safer and easier.
   - states:
       hooray: { type: ACTIVE }

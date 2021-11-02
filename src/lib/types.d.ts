@@ -29,6 +29,7 @@ export interface Step {
   states: { [key: string]: State };
   duration?: number;
   notes?: string;
+  endSection?: boolean;
 }
 
 export interface Script {

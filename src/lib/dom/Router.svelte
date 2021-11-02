@@ -20,10 +20,12 @@
     $state.type === 'DEPLOY'
       ? new Array(3).fill({ code: $state.code, schema: $state.schema, new: true })
       : new Array(3).fill({ code, schema, new: false });
+
+  $: hideName = 'hideName' in $state;
 </script>
 
 {#if visible}
-  <div in:fly out:fly class="grid justify-center">
+  <div in:fly out:fly class="relative grid justify-center">
     <div
       class="border-2 border-gray-300 bg-white rounded-lg shadow overflow-hidden transition-all"
       use:registerBox={{ id, boxes }}
@@ -45,8 +47,10 @@
         {/each}
       </div>
     </div>
-    <!-- <div class="text-center text-xl">
-      {name}
-    </div> -->
+    {#if !hideName}
+      <div class="absolute -bottom-7 w-full text-center text-xl">
+        {name}
+      </div>
+    {/if}
   </div>
 {/if}

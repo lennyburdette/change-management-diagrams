@@ -36,7 +36,7 @@
       case 'T':
         return from.y;
       case 'B':
-        return from.y + from.height;
+        return from.y + from.height - 10;
     }
   })();
   $: x2 = (() => {

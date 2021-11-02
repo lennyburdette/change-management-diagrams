@@ -174,8 +174,8 @@
       </div>
 
       <div class="grid gap-6">
-        <Subgraph id="subgraph-a" name="Products" schema="A" code={0} />
-        <Subgraph id="subgraph-b" name="Reviews" schema="X" code={2} />
+        <Subgraph id="subgraph-a" name="Products Subgraph" schema="A" code={0} />
+        <Subgraph id="subgraph-b" name="Reviews Subgraph" schema="X" code={2} />
       </div>
 
       <div class="grid gap-6">

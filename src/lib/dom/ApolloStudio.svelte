@@ -51,5 +51,9 @@
         <WorkLine big>❌</WorkLine>
       {/if}
     </div>
+
+    <!-- <div class="absolute top-[-80px] w-[300px] border-2 border-red-500 p-2 rounded-lg bg-red-100">
+      ❌ Field <span class="font-mono">Product.reviews</span> already exists in the schema.
+    </div> -->
   </div>
 {/if}

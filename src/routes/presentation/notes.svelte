@@ -29,13 +29,13 @@
 <svelte:window on:keydown={listener} />
 
 <div class="p-4">
-  {#each SCRIPT.steps as { notes, duration }, i}
+  {#each SCRIPT.steps as { notes, duration, endSection }, i}
     {#if notes}
       <div
         bind:this={nodes[i]}
-        class="text-3xl text-black text-opacity-40 pb-4 max-w-prose"
+        class="text-3xl text-black  text-opacity-40 pb-4 max-w-prose"
         class:text-opacity-100={i === index}
-        class:text-red-900={!!duration}
+        class:text-red-700={!!duration}
       >
         {@html notes.split(/[\t\n]{2,}/).join('<br><br>')}
       </div>
@@ -46,6 +46,10 @@
         class:bg-opacity-100={i === index}
         class:bg-red-900={!!duration}
       />
+    {/if}
+
+    {#if endSection}
+      <hr class="my-4 border-2" />
     {/if}
   {/each}
 </div>

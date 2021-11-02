@@ -26,9 +26,9 @@ type Product @key(fields: "id") {
   let removed = false;
 
   onMount(() => {
-    setTimeout(() => (label = true), 1000);
-    setTimeout(() => (nextFile = true), 2000);
-    setTimeout(() => (removed = true), 2500);
+    setTimeout(() => (removed = true), 1000);
+    setTimeout(() => (label = true), 2000);
+    setTimeout(() => (nextFile = true), 3000);
   });
 </script>
 
@@ -40,15 +40,15 @@ type Product @key(fields: "id") {
         {#if label}
           <span
             in:scale={{ easing: backOut }}
-            class={`inline-block relative px-2 ml-2 rounded -top-1 ${COLORS[0]} uppercase text-lg tracking-wide`}
+            class={`inline-block relative px-2 ml-2 rounded -top-1 ${COLORS[3]} uppercase text-lg tracking-wide`}
           >
-            Runtime
+            For Publishing
           </span>
         {/if}
       </svelte:fragment>
       <pre
         class="text-2xl font-mono text-gray-700"><code>{code1}
-<span class="relative inline-block font-bold transition-all duration-300">{removal}</span>
+<span class="relative inline-block font-bold transition-all duration-300" class:text-red-900={removed} class:bg-red-100={removed}>{#if removed}<span in:scale={{ easing: backOut, duration: 300 }} class="absolute top-[50%] w-full border-2 border-black h-1 transition-all"></span>{/if}{removal}</span>
 {code2}</code></pre>
     </CodeFile>
 
@@ -57,15 +57,16 @@ type Product @key(fields: "id") {
         <CodeFile>
           <svelte:fragment slot="title">
             Product subgraph
+
             <span
-              class={`inline-block relative px-2 ml-2 rounded -top-1 ${COLORS[3]} uppercase text-lg tracking-wide`}
+              class={`inline-block relative px-2 ml-2 rounded -top-1 ${COLORS[0]} uppercase text-lg tracking-wide`}
             >
-              For Publishing
+              Runtime
             </span>
           </svelte:fragment>
           <pre
             class="text-2xl font-mono text-gray-700"><code>{code1}
-<span class="relative inline-block font-bold transition-all duration-300" class:text-red-900={removed} class:bg-red-100={removed}>{#if removed}<span in:scale={{ easing: backOut, duration: 300 }} class="absolute top-[50%] w-full border-2 border-black h-1 transition-all"></span>{/if}{removal}</span>
+<span class="relative inline-block font-bold transition-all duration-300">{removal}</span>
 {code2}</code></pre>
         </CodeFile>
       </div>

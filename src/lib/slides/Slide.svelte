@@ -18,6 +18,7 @@
   import RemoveTags from './RemoveTags.svelte';
   import ReviewsAdd from './ReviewsAdd.svelte';
   import Rollbacks from './Rollbacks.svelte';
+  import Scenarios from './Scenarios.svelte';
   import StagedReleases from './StagedReleases.svelte';
   import Success from './Success.svelte';
   import TagDirectives from './TagDirectives.svelte';
@@ -39,6 +40,8 @@
         return MakingChanges;
       case 'TERMS':
         return Terms;
+      case 'SCENARIOS':
+        return Scenarios;
       case 'BACKWARD_COMPATIBLE':
         return BackwardCompatible;
       case 'BACKWARD_COMPATIBLE_CODE':
