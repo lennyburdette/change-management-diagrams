@@ -91,30 +91,13 @@ steps:
   - states:
       slide: { type: ACTIVE, id: AGENDA }
     notes: |
-      My name is Lenny Burdette, my pronouns are he/him/his, and I'm a Solutions Architect at
-      Apollo. I'm going to go over a few change management scenarios before I
-      had it over to Mark Faga from Wayfair, who will describe how they're
-      putting these principles into practice to create an exceptional developer
-      experience.
-  - states:
-      slide: { type: ACTIVE, id: MAKING_CHANGES }
-    notes: |
-      A federated GraphQL API is inherently a bit complex. It involves a few
-      different layers of services, and requires coordinating changes between
-      these layers. This is especially true of GraphQL schema changes which
-      must be coordinated between your subgraph services and the router.
-
-      Fortunately, Apollo provides Managed Federation in its Schema Registry to
-      make this easier. Unfortunately, it doesn't do everything and making
-      changes safely still requires a clear understanding of the problem and
-      careful planning.
-
-      Honestly, it took me an embarrassingly long time to really understand how
-      schema changes work with Managed Federation. So I wanted to take this
-      opportunity to visualize a few change management scenarios to help out
-      anyone else struggling with this.
+      My name is Lenny Burdette, my pronouns are he and him, and I'm a Solutions Architect at
+      Apollo. I'm going to go over some theory on change management with a unified federated graph before I
+      hand it over to Mark Faga from Wayfair to talk about how they're making this work in practice.
   - states:
       slide: { type: ACTIVE, id: SCENARIOS }
+    notes: |
+      A federated GraphQL architecture involves several components, and changing them safely sometimes requires careful planning. Apollo's Managed federation handles some of this for you, but not everything. Let's take a look at some common scenarios and talk through the proper sequence of events.
     endSection: true
 
   # section 1
@@ -139,7 +122,8 @@ steps:
       c-client-router: { type: DEFAULT }
       studio: { type: ACTIVE }
       c-studio-router: { type: ACTIVE }
-    notes: Which receives its schema from the schema registry in Studio using Managed Federation.
+    notes: |
+      The router receives its schema from the schema registry in Studio using Managed Federation. The schema registry is the source of truth for all schema information and handles composing the unified schema for the query planner.
   - states:
       studio: { type: DEFAULT }
       subgraph-a: { type: ACTIVE }
@@ -147,8 +131,7 @@ steps:
       c-studio-router: { type: DEFAULT }
       c-router-subgraph-a: { type: ACTIVE }
       c-router-subgraph-b: { type: ACTIVE }
-    notes: The router breaks that request up into smaller GraphQL requests to
-      your subgraph services
+    notes: The router uses the query planner to break up requests into smaller requests to your subgraphs, or domain-specific GraphQL APIs,
   - states:
       router: { type: DEFAULT }
       c-router-subgraph-a: { type: DEFAULT }
@@ -159,6 +142,23 @@ steps:
       c-subgraph-b-database: { type: ACTIVE }
     notes: Which call other APIs or query databases to resolve fields.
   - states:
+      task-merge-pr: { type: COMPLETE, highlight: true }
+      task-tests: { type: COMPLETE, highlight: true }
+      task-checks: { type: COMPLETE, highlight: true }
+      task-build-sdl: { type: COMPLETE, highlight: true }
+      task-build-artifact: { type: COMPLETE, highlight: true }
+      task-deploy: { type: COMPLETE, highlight: true }
+      task-publish: { type: COMPLETE, highlight: true }
+    notes: Our continuous integration and release pipeline consists of several steps. The steps that integrate with Apollo Studio typically use the Rover command line tool.
+  - states:
+      task-merge-pr: { type: DEFAULT }
+      task-tests: { type: DEFAULT }
+      task-checks: { type: DEFAULT }
+      task-build-sdl: { type: DEFAULT }
+      task-build-artifact: { type: DEFAULT }
+      task-deploy: { type: DEFAULT }
+      task-publish: { type: DEFAULT }
+
       subgraph-a: { type: DEFAULT }
       subgraph-b: { type: DEFAULT }
       rest: { type: DEFAULT }
@@ -189,10 +189,7 @@ steps:
       studio: { type: ACTIVE }
     notes: |
       It should also use the Rover command line tool to run a Subgraph Check against the
-      Schema Registry. The Subgraph Check will
-      confirm that our changes won't affect existing operations (which it won't
-      because adding a field is backward-compatible), and that our changes are
-      compatible with other subgraphs.
+      Schema Registry. The Subgraph Check confirms that our changes won't break existing clients and that they're compatible with other subgraphs.
 
   ### checks
   - states:
@@ -220,9 +217,10 @@ steps:
       task-build-sdl: { type: COMPLETE, highlight: false, schema: B }
       task-build-artifact: { type: COMPLETE, highlight: true, code: 3 }
     notes: |
-      We'll also build the docker container, jar, or tarball that we'll use to deploy the new
-      version of our subgraph code. If we're using Kubernetes or something
-      similar, we may also generate deployment manifest files.
+      We'll also build the docker container or jar containing the code that
+      we'll deploy to our servers.
+
+      [PAUSE]
 
       At this point, if we practice continuous delivery, we automatically
       continue to the next steps.
@@ -264,10 +262,11 @@ steps:
       that clients specify exactly fields that they need, and they won't get
       anything they don't ask for. We haven't updated our client apps to use the
       new field, so this is not a situation we encounter in practice. Mark put it
-      a clever way a while back: "It's not like clients are polling your GraphQL introspection response
-        looking for new fields to immediately call."
+      a clever way a while back: "It's not like clients are polling your GraphQL
+      introspection response looking for new fields to immediately call." This
+      wasn't intuitive to me at first, but hopefully it makes sense to you now.
 
-      This failure scenario is not something we can easily get into.
+      So with that in mind, we'll continue with our release process.
   - states:
       c-client-router: { type: DEFAULT }
       client: { type: DEFAULT }
@@ -395,7 +394,7 @@ steps:
     notes: |
       If a client makes an operation containing the removed field, in this case the router will allow it, sending a request to the Products subgraph, which will then respond with an error. This may cause the entire request to fail.
 
-      But! Why are we removing a field that's actively being used?!
+      But wait! Why are we removing a field that's actively being used?!
   - states:
       client: { type: DEFAULT }
       c-client-router: { type: DEFAULT }
@@ -420,6 +419,8 @@ steps:
       task-deploy: { type: DEFAULT }
       subgraph-a: { type: DEFAULT }
     duration: 800
+    notes: |
+      If we couldn't get field usage to zero, but we know that the clients using the field are unsupported, our Subgraph Check will fail at this point during CI.
   - states:
       studio: { type: ACTIVE, work: check-composition }
     duration: 800
@@ -429,8 +430,6 @@ steps:
   - states:
       studio: { type: ACTIVE, work: error }
       task-checks: { type: BROKEN }
-    notes: |
-      If we couldn't get field usage to zero, but we know that the clients using the field are unsupported, our Subgraph Check will fail at this point during CI.
   - states:
       slide: { type: ACTIVE, id: OVERRIDE_UI }
     notes: |
@@ -451,9 +450,9 @@ steps:
       <<: *RESET
       slide: { type: ACTIVE, id: ROLLBACKS }
     notes: |
-      I often get questions about performing rollbacks if we encounter problems with these deployments. But what does it mean to rollback an API change? Rolling back a field addition becomes a field removal change, breaking all clients now depending on this field in their operations. This is definitely something we want to avoid!
+      I often get questions about performing rollbacks if we encounter problems with these deployments. But what does it mean to rollback an API change? Rolling back a field addition becomes a field removal, breaking all clients now depending on this field in their operations. This is definitely something we want to avoid!
 
-      (As an aside, this is one of the reasons why we suggest keeping subgraphs separate from  underlying services — if you co-mingle schema changes with other kinds of logic and data changes and need to rollback both, you get into a very awkward situation!)
+      It's worth noting that this is why we recommend keeping subgraphs separate from underlying services. If you co-mingle schema changes with other kinds of logic and data changes and need to rollback both, you get into a very awkward situation!
   - states:
       slide: { type: ACTIVE, id: STAGED_RELEASES }
     notes: |
@@ -550,13 +549,11 @@ steps:
       slide: { type: ACTIVE, id: MULTIPLE_SUBGRAPHS }
       <<: *RESET
     notes: |
-      The last scenario I want to cover is coordinating schema changes across multiple subgraphs. There are a few reasons you might need to change multiple subgraph simultaneously. Some of those reasons, like keeping an Enum type in sync, will get significantly easier with Federation 2, which we announced earlier today.
+      The last scenario I want to cover is coordinating schema changes across multiple subgraphs.
   - states:
       slide: { type: HIDE }
     notes: |
-      For this talk, we'll focus on what we call the "schema shuffle", moving a field from one subgraph to another. We'll walk through this change using the Federation 1 composition model that's available today.
-
-      One important note about this change: the GraphQL API that our client apps use is not changing. Instead, only the metadata used for federation query planning changes. It's always a good idea to isolate API changes from query planning changes.
+      For this talk, we'll focus on what we call the "schema shuffle", moving a field from one subgraph to another. We'll walk through this change using the Federation 1 composition model that's available today — but it's worth noting that this improves with Federation 2, which we announced early in the conference.
   - states:
       subgraph-a: { type: ACTIVE }
       subgraph-b: { type: ACTIVE }
@@ -569,7 +566,7 @@ steps:
       first-pipeline: { type: DIMMED }
       first-pipeline-title: { type: DEFAULT }
     notes: |
-      We'll need a second release pipeline to track these steps.
+      Here's a second release pipeline to track these steps.
   - states:
       slide: { type: ACTIVE, id: REVIEWS_ADD }
     notes: |
@@ -637,7 +634,7 @@ steps:
       studio: { type: ACTIVE, work: check-composition }
     duration: 800
     notes: |
-      When Apollo Studio receives this subgraph SDL, the change will "fail" to compose and Studio will not deliver a new supergraph to the routers.
+      When Apollo Studio receives this subgraph SDL, the change will "fail" to compose, just as the subgraph check warned us it would, and Studio will not deliver a new supergraph to the routers.
   - states:
       studio: { type: ACTIVE, work: error }
       task2-publish: { type: COMPLETE }
@@ -659,7 +656,7 @@ steps:
     notes: |
       In a separate change, we'll prepare our Products subgraph to relinquish the responsibility of resolving this field.
 
-      In this case, we want to *remove* the field from the schema that we publish,
+      We'll effectively have two versions of our Products schema. We'll remove the field from the version that we publish to the schema registry,
 
       but we *don't* want to remove it from the runtime schema or remove the resolver — we'll see why in a moment.
   - states:
@@ -724,9 +721,11 @@ steps:
   - states:
       task-publish: { type: COMPLETE }
       studio: { type: ACTIVE, work: complete }
+      c-studio-router: { type: ACTIVE }
     duration: 1000
   - states:
       studio: { type: DEFAULT }
+      c-studio-router: { type: DEFAULT }
       router: { type: DEPLOY, code: 1, schema: BY, active: true }
     duration: 1000
     notes: |
@@ -735,7 +734,7 @@ steps:
       router: { type: DEPLOY, code: 1, schema: BY, active: false }
       c-router-subgraph-b: { type: ACTIVE }
     notes: |
-      Once we're in a good state, we can finally delete the field resolver from the Products subgraph and release that change. We have successfully shuffled our schema.
+      The final step is to delete the field resolver from the Products subgraph and release that change. And now we have successfully shuffled our schema.
   - states:
       c-router-subgraph-b: { type: DEFAULT }
       hooray: { type: ACTIVE }
@@ -808,17 +807,19 @@ steps:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 2 }
     notes: |
       The deprecation process, assisted by field usage information, is critical to safely making breaking changes.
+  # - states:
+  #     slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 3 }
+  #   notes: |
+  #     It's always preferable to isolate changes from one another. For example, try to avoid changing the client API when changing how query planning works.
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 3 }
     notes: |
-      It's always preferable to isolate changes from one another. For example, try to avoid changing the client API when changing how query planning works.
-  - states:
-      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 4 }
-    notes: |
       API "rollbacks" aren't really a thing. Instead, you should release changes in stages using Contracts to prevent needing rollbacks at all.
   - states:
-      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 5 }
+      slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 4 }
     notes: |
       And finally, check out Federation 2, which we design in large part to make changes like the ones I described safer and easier.
   - states:
       hooray: { type: ACTIVE }
+    notes: |
+      The processes I've covered here are the foundation of a functioning unified GraphQL system. I'll hand it over to Mark to talk about how Wayfair is extending this basic system to make it even better.

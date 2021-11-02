@@ -54,7 +54,7 @@
 
     {#if schemaVersion.length > 0}
       <div in:scale={{ easing: backOut }} out:scale class="absolute right-2 text-base">
-        <div class="relative scale-75"><Document version={schemaVersion} /></div>
+        <Document version={schemaVersion} small />
       </div>
     {:else if codeVersion > -1}
       <div
