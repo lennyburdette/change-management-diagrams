@@ -1,12 +1,12 @@
 import type { State, Step } from '$lib/types';
 import { getContext, setContext } from 'svelte';
-import { derived, writable } from 'svelte/store';
-import type { Readable, Writable } from 'svelte/store';
+import { derived } from 'svelte/store';
+import type { Readable } from 'svelte/store';
 
 const contextKey = Symbol('STATES');
 
-export function initStates(): Writable<{ [key: string]: State }> {
-  const store = writable({});
+export function initStates(state: Readable<Step>): Readable<{ [key: string]: State }> {
+  const store = derived(state, (step) => step.states);
   setContext(contextKey, store);
   return store;
 }
@@ -15,13 +15,14 @@ export function getStates(): Readable<{ [key: string]: State }> {
   return getContext(contextKey);
 }
 
+const defaultState = { type: 'DEFAULT' };
 export function getState(id: string): Readable<State> {
   const store = getStates();
   return derived(store, ($store) => {
     if (id in $store) {
       return $store[id];
     } else {
-      return { type: 'DEFAULT' } as State;
+      return defaultState as State;
     }
   });
 }

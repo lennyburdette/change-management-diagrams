@@ -21,9 +21,17 @@ _reset: &RESET
   beta-router: { type: HIDE }
   laptop: { type: HIDE }
 
+  c-client-router: { type: DEFAULT }
   c-router-subgraph-a: { type: DEFAULT }
   c-router-subgraph-b: { type: DEFAULT }
-  c-client-router: { type: DEFAULT }
+  c-subgraph-a-rest: { type: DEFAULT }
+  c-subgraph-b-database: { type: DEFAULT }
+  c-studio-router: { type: DEFAULT }
+  c-beta-client-beta-router: { type: DEFAULT }
+  c-studio-beta-router: { type: DEFAULT }
+  c-beta-router-subgraph-a: { type: DEFAULT }
+  c-beta-router-subgraph-b: { type: DEFAULT }
+  c-laptop-studio: { type: DEFAULT }
 
   second-pipeline: { type: HIDE }
   first-pipeline-title: { type: HIDE }
@@ -97,7 +105,7 @@ steps:
   - states:
       slide: { type: ACTIVE, id: SCENARIOS }
     notes: |
-      A federated GraphQL architecture involves several components, and changing them safely sometimes requires careful planning. Apollo's Managed federation handles some of this for you, but not everything. Let's take a look at some common scenarios and talk through the proper sequence of events.
+      A federated GraphQL architecture involves several moving parts, and changing them safely sometimes requires careful planning. Apollo's Managed federation handles some of this for you, but not everything. Let's take a look at some common scenarios and visualize the proper sequence of events.
     endSection: true
 
   # section 1
@@ -123,7 +131,7 @@ steps:
       studio: { type: ACTIVE }
       c-studio-router: { type: ACTIVE }
     notes: |
-      The router receives its schema from the schema registry in Studio using Managed Federation. The schema registry is the source of truth for all schema information and handles composing the unified schema for the query planner.
+      The router receives its schema from the schema registry in Studio using Managed Federation. The schema registry is the source of truth for all schema information and handles composing the unified schema out of smaller schemas to create your GraphQL API.
   - states:
       studio: { type: DEFAULT }
       subgraph-a: { type: ACTIVE }
@@ -131,7 +139,7 @@ steps:
       c-studio-router: { type: DEFAULT }
       c-router-subgraph-a: { type: ACTIVE }
       c-router-subgraph-b: { type: ACTIVE }
-    notes: The router uses the query planner to break up requests into smaller requests to your subgraphs, or domain-specific GraphQL APIs,
+    notes: The router breaks up requests into smaller requests to your subgraphs, or domain-specific GraphQL APIs,
   - states:
       router: { type: DEFAULT }
       c-router-subgraph-a: { type: DEFAULT }
@@ -212,7 +220,7 @@ steps:
       studio: { type: DEFAULT }
       task-checks: { type: COMPLETE, highlight: false }
       task-build-sdl: { type: COMPLETE, highlight: true, schema: B }
-    notes: We'll generate the subgraph SDL for publishing to the schema registry.
+    notes: We'll generate the subgraph SDL file for publishing to the schema registry.
   - states:
       task-build-sdl: { type: COMPLETE, highlight: false, schema: B }
       task-build-artifact: { type: COMPLETE, highlight: true, code: 3 }
@@ -222,14 +230,13 @@ steps:
 
       [PAUSE]
 
-      At this point, if we practice continuous delivery, we automatically
-      continue to the next steps.
+      At this point, if we practice continuous delivery, we'll automatically
+      continue to the next step.
   - states:
       task-build-artifact: { type: COMPLETE, highlight: false, code: 3 }
       task-deploy: { type: ACTIVE }
     notes: |
-      We'll first deploy our subgraphs with the new
-      schema and code.
+      which is to deploy our subgraphs with the new schema and code.
 
   ### deploy subgraph
   - states:
@@ -239,8 +246,8 @@ steps:
       subgraph-a:
         { type: ROLLING_DEPLOY, servers: [{ code: 3, schema: 'B' }, { code: 3, schema: 'B' }] }
     notes: |
-      As the subgraph replicas roll out, we're now in various inconsistent states.
-      Briefly our subgraphs don't have the same schema.
+      As the subgraph replicas roll out, we're now in an inconsistent state.
+      Briefly our subgraphs replicas don't have the same schema.
   - states:
       subgraph-a:
         {
@@ -274,7 +281,7 @@ steps:
   - states:
       task-publish: { type: ACTIVE }
     notes: |
-      Once our subgraph replicas have rolled out, the release process continues
+      Once our subgraph replicas have rolled out, we'll move to the next step
       and we publish the subgraph schema to Apollo Studio.
 
   ### compose and launch
@@ -336,7 +343,7 @@ steps:
       make sure another team hasn't released a subgraph change that's
       incompatible with our change.
 
-      But otherwise it's the same.
+      But otherwise it's exactly the same.
     endSection: true
 
   # section 2 - backwards incompatible
@@ -450,7 +457,7 @@ steps:
       <<: *RESET
       slide: { type: ACTIVE, id: ROLLBACKS }
     notes: |
-      I often get questions about performing rollbacks if we encounter problems with these deployments. But what does it mean to rollback an API change? Rolling back a field addition becomes a field removal, breaking all clients now depending on this field in their operations. This is definitely something we want to avoid!
+      I often get questions about performing rollbacks if we encounter problems with these releases. But what does it mean to rollback an API change? Rolling back a field addition becomes a field removal, breaking all clients now depending on this field in their operations. This is definitely something we want to avoid!
 
       It's worth noting that this is why we recommend keeping subgraphs separate from underlying services. If you co-mingle schema changes with other kinds of logic and data changes and need to rollback both, you get into a very awkward situation!
   - states:
@@ -508,7 +515,7 @@ steps:
   - states:
       task-publish: { type: ACTIVE }
     notes: |
-      When we publish the subgraph, Apollo Studio will generate two supergraphs:
+      When we publish the subgraph, Apollo Studio will generate two supergraph schemas:
   - states:
       studio: { type: ACTIVE, work: compose }
     duration: 400
@@ -542,6 +549,8 @@ steps:
     notes: Once we're sure the new schema and code are good to go, we can release another change removing the tag.
   - states:
       hooray: { type: ACTIVE }
+    notes: |
+      And that's how we can safely release changes in stages!
     endSection: true
 
   # section 4 - multiple subgraphs
@@ -566,7 +575,7 @@ steps:
       first-pipeline: { type: DIMMED }
       first-pipeline-title: { type: DEFAULT }
     notes: |
-      Here's a second release pipeline to track these steps.
+      Here's a second release pipeline to track these steps. The idea is that subgraph teams can still operate independently with their own release pipelines, but to perform a schema shuffle they'll need to coordinate on the sequence of events.
   - states:
       slide: { type: ACTIVE, id: REVIEWS_ADD }
     notes: |
@@ -575,6 +584,8 @@ steps:
       slide: { type: HIDE }
     notes: |
       The tests and checks run — but here we hit our first hiccup: the checks fail because the two subgraph schemas no longer compose.
+
+      We'll get an error saying that Field "Product.reviews" already exists in the schema. This is expected!
     duration: 800
   - states:
       task2-merge-pr: { type: COMPLETE }
@@ -591,8 +602,6 @@ steps:
   - states:
       studio: { type: ACTIVE, work: error }
       task2-checks: { type: BROKEN }
-    notes: |
-      We'll get an error saying that Field "Product.reviews" already exists in the schema. This is expected!
   - states:
       checks-bypass: { type: DEFAULT }
     notes: |
@@ -634,7 +643,7 @@ steps:
       studio: { type: ACTIVE, work: check-composition }
     duration: 800
     notes: |
-      When Apollo Studio receives this subgraph SDL, the change will "fail" to compose, just as the subgraph check warned us it would, and Studio will not deliver a new supergraph to the routers.
+      When Apollo Studio receives this subgraph SDL, the change will fail to compose, just as the subgraph check warned us it would, and Studio will not deliver a new supergraph to the routers.
   - states:
       studio: { type: ACTIVE, work: error }
       task2-publish: { type: COMPLETE }
@@ -655,10 +664,17 @@ steps:
       slide: { type: ACTIVE, id: PRODUCTS_REMOVE }
     notes: |
       In a separate change, we'll prepare our Products subgraph to relinquish the responsibility of resolving this field.
-
+  - states:
+      slide: { type: ACTIVE, id: PRODUCTS_REMOVE, step: 1 }
+    duration: 1000
+    notes: |
       We'll effectively have two versions of our Products schema. We'll remove the field from the version that we publish to the schema registry,
 
       but we *don't* want to remove it from the runtime schema or remove the resolver — we'll see why in a moment.
+
+      How you can accomplish this depends on how you build your subgraph services. You can literally have two files, or you can have a script that transforms the schema before publishing.
+  - states:
+      slide: { type: ACTIVE, id: PRODUCTS_REMOVE, step: 2 }
   - states:
       slide: { type: HIDE }
       task-merge-pr: { type: COMPLETE }
@@ -769,7 +785,7 @@ steps:
       laptop: { type: ACTIVE }
       c-laptop-studio: { type: ACTIVE }
     notes: |
-      With the current version of federation, this process is a bit unwieldy. Some teams choose to simplify it by publishing the schemas from development machines or a separate git repo. As long as you make sure both subgraphs can resolve the field before publishing, this is an easy and safe approach.
+      With the current version of federation, this process is a bit unwieldy. Some teams choose to simplify it by publishing the schemas from development machines or a separate git repo. As long as you make sure both subgraphs can resolve the field before manually publishing, this is an easy and safe approach.
   - states:
       studio: { type: ACTIVE, work: compose }
     duration: 800
@@ -783,9 +799,11 @@ steps:
     duration: 800
   - states:
       studio: { type: DEFAULT }
+      c-studio-router: { type: ACTIVE }
       router: { type: DEPLOY, code: 1, schema: BY, active: true }
     duration: 800
   - states:
+      c-studio-router: { type: DEFAULT }
       router: { type: DEPLOY, code: 1, schema: BY, active: false }
       c-router-subgraph-b: { type: ACTIVE }
     notes: |
@@ -818,8 +836,8 @@ steps:
   - states:
       slide: { type: ACTIVE, id: KEY_TAKEAWAY_BULLETS, step: 4 }
     notes: |
-      And finally, check out Federation 2, which we design in large part to make changes like the ones I described safer and easier.
+      And finally, shared schema changes are possible with a little bit of planning. But check out Federation 2, which we designed in large part to improve the process of changes schemas together.
   - states:
-      hooray: { type: ACTIVE }
+      slide: { type: ACTIVE, id: CONCLUSION }
     notes: |
-      The processes I've covered here are the foundation of a functioning unified GraphQL system. I'll hand it over to Mark to talk about how Wayfair is extending this basic system to make it even better.
+      The processes I've covered here are the foundation of a unified GraphQL system. If you want to know more, please check out our Federation Enterprise Guide in the Apollo documentation. Now I'll hand it over to Mark to talk about how Wayfair is expanding on these ideas to create an exceptional developer experience.

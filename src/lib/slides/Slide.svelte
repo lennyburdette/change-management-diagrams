@@ -7,6 +7,7 @@
   import BackwardCompatibleCode from './BackwardCompatibleCode.svelte';
   import BackwardIncompatible from './BackwardIncompatible.svelte';
   import BackwardIncompatibleCode from './BackwardIncompatibleCode.svelte';
+  import Conclusion from './Conclusion.svelte';
   import FieldUsage from './FieldUsage.svelte';
   import Intro from './Intro.svelte';
   import KeyTakeawayBullets from './KeyTakeawayBullets.svelte';
@@ -76,6 +77,8 @@
         return KeyTakeaways;
       case 'KEY_TAKEAWAY_BULLETS':
         return KeyTakeawayBullets;
+      case 'CONCLUSION':
+        return Conclusion;
       default:
         return Todo;
     }

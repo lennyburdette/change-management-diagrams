@@ -9,7 +9,6 @@
 
   onMount(() => {
     window.addEventListener('message', ({ data }) => {
-      console.log(data);
       index = data.index;
     });
     window.opener.postMessage('refresh');

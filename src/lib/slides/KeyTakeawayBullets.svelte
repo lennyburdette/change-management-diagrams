@@ -6,7 +6,7 @@
   class="absolute inset-0 bg-gradient-to-tr from-purple-900 to-blue-300 grid place-content-center"
 >
   <div class="mx-28 font-bold text-white">
-    <ul class="list-disc text-5xl space-y-8">
+    <ul class="list-disc text-5xl space-y-14">
       <li class="opacity-0 transition-all" class:opacity-100={step >= 1}>
         Temporary inconsistency isn’t that big of a deal
       </li>

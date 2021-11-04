@@ -133,14 +133,17 @@
 
   // $: running = false; // $state.type === 'DEFAULT';
   $: broken = $state.type === 'BROKEN';
+  $: color =
+    $state.type === 'ACTIVE'
+      ? 'text-purple-800'
+      : $state.type === 'DIMMED'
+      ? 'text-gray-200'
+      : broken
+      ? 'text-red-600'
+      : 'text-gray-500';
 </script>
 
-<g
-  opacity={visible ? 1 : 0}
-  class:text-purple-800={$state.type === 'ACTIVE'}
-  class:text-gray-200={$state.type === 'DIMMED'}
-  class:text-red-600={broken}
->
+<g opacity={visible ? 1 : 0} class={color}>
   <defs>
     <marker
       id="{id}-triangle-right"

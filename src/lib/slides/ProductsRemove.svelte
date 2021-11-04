@@ -21,14 +21,12 @@ type Product @key(fields: "id") {
   const code2 = `}
 `;
 
-  let label = false;
-  let nextFile = false;
   let removed = false;
 
+  export let step = 0;
+
   onMount(() => {
-    setTimeout(() => (removed = true), 1000);
-    setTimeout(() => (label = true), 2000);
-    setTimeout(() => (nextFile = true), 3000);
+    setTimeout(() => (removed = true), 500);
   });
 </script>
 
@@ -37,7 +35,7 @@ type Product @key(fields: "id") {
     <CodeFile>
       <svelte:fragment slot="title">
         Product subgraph
-        {#if label}
+        {#if step >= 2}
           <span
             in:scale={{ easing: backOut }}
             class={`inline-block relative px-2 ml-2 rounded -top-1 ${COLORS[3]} uppercase text-lg tracking-wide`}
@@ -52,7 +50,7 @@ type Product @key(fields: "id") {
 {code2}</code></pre>
     </CodeFile>
 
-    {#if nextFile}
+    {#if step >= 1}
       <div in:scale={{ easing: backOut }}>
         <CodeFile>
           <svelte:fragment slot="title">

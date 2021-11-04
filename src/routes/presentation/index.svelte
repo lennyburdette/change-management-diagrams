@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   import { initStates, reifySteps } from '$lib/dom/state';
   import { initBoxes } from '$lib/dom/boxContext';
 
   import Step from '$lib/dom/Step.svelte';
-  import ProgressBar from '$lib/ProgressBar.svelte';
   import Component from '$lib/dom/Component.svelte';
   import TopologyContainer from '$lib/dom/TopologyContainer.svelte';
   import ApolloStudio from '$lib/dom/ApolloStudio.svelte';
@@ -21,13 +20,11 @@
   import Hooray from '$lib/dom/Hooray.svelte';
 
   const reifiedSteps = reifySteps(SCRIPT.steps);
-
-  const stateStore = initStates();
   initBoxes();
 
-  const { currentStep, next, prev, jump, progress, index } = initPlayer(reifiedSteps);
+  const { currentStep, next, prev, jump, index } = initPlayer(reifiedSteps);
 
-  $: $stateStore = $currentStep?.states;
+  initStates(currentStep);
 
   let notesWindow: Window | undefined;
   onMount(() => {
@@ -37,7 +34,6 @@
     }
     index.subscribe((s) => {
       window.location.hash = `${s}`;
-      console.log('update');
       notesWindow?.postMessage({ index: s }, '*');
     });
 
@@ -76,8 +72,6 @@
 </script>
 
 <Slide />
-
-<ProgressBar value={$progress} />
 
 <div class="h-[100vh] flex flex-col space-y-4">
   <ShowHide id="first-pipeline">
